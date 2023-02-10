@@ -1,6 +1,7 @@
 import socket
 from bluetooth import *
 import os
+from STMInterface import STM
 
 UUID = "00001101-0000-1000-8000-00805F9B34FB"
 ANDROID_SOCKET_BUFFER_SIZE = 2048
@@ -108,18 +109,24 @@ class Android:
             print('[AND-WRITE ERROR] %s' % str(e))
             raise e
 
+    def write_to_
 
 if __name__ == '__main__':
     ser = Android()
 #    ser.__init__()
     ser.connect_AND()
+
+    STMser = STM()
+    STMser.connect_STM()
     while True:
         try:
             print('In loop')
             msg = ser.read_from_AND()
-            print(msg)
-            writemsg = str(input('insert msg')+ ' from rpi' )
-            ser.write_to_AND(writemsg)
+            print("sending msg to stm" + msg)
+            #writemsg = str(input('insert msg')+ ' from rpi' )
+            #ser.write_to_AND(writemsg)
+            if msg.__contains__('STM'):
+                STM.write_to_STM(msg)
         except KeyboardInterrupt:
             print('AND communication interrupted.')
             ser.disconnect_AND()
