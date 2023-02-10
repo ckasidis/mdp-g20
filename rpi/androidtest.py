@@ -13,6 +13,7 @@ class Android:
         self.server = None
         self.client = None
 
+        print('Starting Bluetooth')
         os.system('sudo hciconfig hci0 piscan')
         self.server = BluetoothSocket(RFCOMM)
 #        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
