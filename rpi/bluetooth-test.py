@@ -2,7 +2,7 @@
 from bluetooth import *
 
 server_sock = BluetoothSocket(RFCOMM)
-server_sock.bind(("",8))
+server_sock.bind(("",PORT_ANY))
 server_sock.listen(8)
 port = server_sock.getsockname()[1]
 uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
