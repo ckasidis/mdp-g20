@@ -109,8 +109,6 @@ class Android:
             print('[AND-WRITE ERROR] %s' % str(e))
             raise e
 
-    def write_to_
-
 if __name__ == '__main__':
     ser = Android()
 #    ser.__init__()
@@ -126,7 +124,7 @@ if __name__ == '__main__':
             #writemsg = str(input('insert msg')+ ' from rpi' )
             #ser.write_to_AND(writemsg)
             if msg.__contains__('STM'):
-                print("sending msg to STM")
+                print("sending msg to")
                 STM.write_to_STM_test(msg)
         except KeyboardInterrupt:
             print('AND communication interrupted.')
