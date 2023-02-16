@@ -120,7 +120,8 @@ if __name__ == '__main__':
         try:
             print('In loop')
             msg = ser.read_from_AND()
-            print("received msg from android" + msg)
+            print("received msg from android:")
+            print(msg)
             #writemsg = str(input('insert msg')+ ' from rpi' )
             #ser.write_to_AND(writemsg)
             if msg.__contains__('STM'):
