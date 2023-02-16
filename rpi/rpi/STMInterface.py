@@ -79,6 +79,18 @@ class STM:
         except Exception as e:
             print('[STM-WRITE Error] %s' % str(e))
             raise e
+        
+    def write_to_STM_test(self, message):
+        try:
+
+            print('In STM: write to STM method: before Transmitted to STM:')
+            print('\t %s' % message)
+            print(message.decode()+" sent")
+            print('In STM: write to STM method: after Transmitted to STM')
+
+        except Exception as e:
+            print('[STM-WRITE Error] %s' % str(e))
+            raise e
 
 
 if __name__ == '__main__':

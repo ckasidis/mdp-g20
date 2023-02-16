@@ -117,16 +117,17 @@ if __name__ == '__main__':
     ser.connect_AND()
 
     STMser = STM()
-    STMser.connect_STM()
+    #STMser.connect_STM()
     while True:
         try:
             print('In loop')
             msg = ser.read_from_AND()
-            print("sending msg to stm" + msg)
+            print("received msg from android" + msg)
             #writemsg = str(input('insert msg')+ ' from rpi' )
             #ser.write_to_AND(writemsg)
             if msg.__contains__('STM'):
-                STM.write_to_STM(msg)
+                print("sending msg to STM")
+                STM.write_to_STM_test(msg)
         except KeyboardInterrupt:
             print('AND communication interrupted.')
             ser.disconnect_AND()
