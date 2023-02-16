@@ -80,7 +80,7 @@ class STM:
             print('[STM-WRITE Error] %s' % str(e))
             raise e
         
-    def write_to_STM_test(self, message):
+    def write_to_STM_test(message):
         try:
 
             print('In STM: write to STM method: before Transmitted to STM:')
