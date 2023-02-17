@@ -38,7 +38,7 @@ while True:
 		camera = PiCamera(resolution=(640, 640))
 		rawCapture = PiRGBArray(camera)
 		print("printing rawCapture: " + str(rawCapture))
-		camera.capture(rawCapture, format="bgr")
+		camera.capture(rawCapture, format="rgb")
 		image = rawCapture.array
 		print("printing image: " + str(image))
 		rawCapture.truncate(0)
