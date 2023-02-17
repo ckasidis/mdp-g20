@@ -127,7 +127,7 @@ if __name__ == '__main__':
             #ser.write_to_AND(writemsg)
             if str(msg.decode()).__contains__('STM'):
                 print("sending msg to")
-                STM.write_to_STM(message=msg)
+                STMser.write_to_STM(message=msg)
         except KeyboardInterrupt:
             print('AND communication interrupted.')
             ser.disconnect_AND()
