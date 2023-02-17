@@ -44,6 +44,8 @@ while True:
 		rawCapture.truncate(0)
 		print("trying to send image")
 		print("rpiName: " + str(rpiName))
-		sender.send_image(rpiName, image)
-		print("Reached end of loop")
+		reply =sender.send_image(rpiName, image)
+		print("Receiving reply")
+		reply = str(reply.decode())
+		print('Reply message: ' + reply)
     
