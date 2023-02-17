@@ -35,10 +35,10 @@ while True:
 	if option == "y":
 		camera = PiCamera(resolution=(640, 640))
 		rawCapture = PiRGBArray(camera)
-        print(rawCapture)
+		print(rawCapture)
 		camera.capture(rawCapture, format="bgr")
 		image = rawCapture.array
-        print(image)
+		print(image)
 		rawCapture.truncate(0)
 		sender.send_image(rpiName, image)
-							
+    
