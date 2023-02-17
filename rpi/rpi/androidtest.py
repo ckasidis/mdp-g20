@@ -116,7 +116,7 @@ if __name__ == '__main__':
     ser.connect_AND()
 
     STMser = STM()
-    #STMser.connect_STM()
+    STMser.connect_STM()
     while True:
         try:
             print('In loop')
@@ -127,7 +127,7 @@ if __name__ == '__main__':
             #ser.write_to_AND(writemsg)
             if str(msg.decode()).__contains__('STM'):
                 print("sending msg to")
-                STM.write_to_STM_test(msg)
+                STM.write_to_STM(msg)
         except KeyboardInterrupt:
             print('AND communication interrupted.')
             ser.disconnect_AND()
