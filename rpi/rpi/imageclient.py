@@ -48,4 +48,5 @@ while True:
 		print("Receiving reply")
 		reply = str(reply.decode())
 		print('Reply message: ' + reply)
+		camera.close()
     
