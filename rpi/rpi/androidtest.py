@@ -126,10 +126,11 @@ if __name__ == '__main__':
             #writemsg = str(input('insert msg')+ ' from rpi' )
             #ser.write_to_AND(writemsg)
             if str(msg.decode()).__contains__('STM'):
-                print(msg,"THIS IS THE MESSAGE BEING SENT ")
-                msg.split("STM|")[-1]
+                msgClean = msg.decode()
+                print(msgClean,"THIS IS THE MESSAGE BEING SENT ")
+                msgClean = msgClean.split("STM|")[-1]
                 print("sending msg to")
-                STMser.write_to_STM(message=msg)
+                STMser.write_to_STM(message=msgClean.encode())
         except KeyboardInterrupt:
             print('AND communication interrupted.')
             ser.disconnect_AND()
