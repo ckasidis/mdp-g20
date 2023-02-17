@@ -20,7 +20,7 @@ sender = imagezmq.ImageSender(connect_to="tcp://{}:50000".format(
 # get the host name, initialize the video stream, and allow the
 # camera sensor to warmup
 rpiName = socket.gethostname()
-
+print(rpiName,"\t: the name of rpi")
 # #connect to PiCamera and take capture from there
 # vs = VideoStream(usePiCamera=True, resolution=(320, 240)).start() #choose resolution 
 # #vs = VideoStream(src=0).start()
@@ -31,8 +31,10 @@ rpiName = socket.gethostname()
 # 	frame = vs.read()
 # 	sender.send_image(rpiName, frame)
 while True: 
-	option = input("Take picture")
+	option = input("Take picture:\t")
+    print('it took the input from user')
 	if option == "y":
+        print("it entered the loop on client side")
 		camera = PiCamera(resolution=(640, 640))
 		rawCapture = PiRGBArray(camera)
 		camera.capture(rawCapture, format="bgr")
