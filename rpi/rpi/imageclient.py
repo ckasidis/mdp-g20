@@ -13,7 +13,7 @@ ap.add_argument("-s", "--server-ip", required=True,
 args = vars(ap.parse_args())
 # initialize the ImageSender object with the socket address of the
 # server
-sender = imagezmq.ImageSender(connect_to="tcp://{}:8080".format(
+sender = imagezmq.ImageSender(connect_to="tcp://{}:50000".format(
 	args["server_ip"]))
 
 
