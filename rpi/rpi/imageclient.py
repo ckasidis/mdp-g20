@@ -49,4 +49,7 @@ while True:
 		reply = str(reply.decode())
 		print('Reply message: ' + reply)
 		camera.close()
+		print('Close camera')
+
+
     
