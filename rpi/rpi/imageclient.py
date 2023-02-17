@@ -32,13 +32,13 @@ print(rpiName,"\t: the name of rpi")
 # 	sender.send_image(rpiName, frame)
 while True: 
 	option = input("Take picture:\t")
-    print('it took the input from user')
 	if option == "y":
-        print("it entered the loop on client side")
 		camera = PiCamera(resolution=(640, 640))
 		rawCapture = PiRGBArray(camera)
+        print(rawCapture)
 		camera.capture(rawCapture, format="bgr")
 		image = rawCapture.array
+        print(image)
 		rawCapture.truncate(0)
 		sender.send_image(rpiName, image)
 							
