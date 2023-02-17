@@ -40,5 +40,6 @@ while True:
 		image = rawCapture.array
 		print(image)
 		rawCapture.truncate(0)
+		print("trying to send image")
 		sender.send_image(rpiName, image)
     
