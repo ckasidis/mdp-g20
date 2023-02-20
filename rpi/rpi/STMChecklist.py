@@ -163,5 +163,5 @@ if __name__ == '__main__':
         for instr in instr_list:
             img.write_to_STM(instr.encode())
             while True:
-                    time.sleep(1)
+                    time.sleep(2)
                     break
