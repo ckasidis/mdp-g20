@@ -156,7 +156,6 @@ if __name__ == '__main__':
             break
         
         ser.write_to_STM(("FW010").encode())
-        time.sleep(10)
+        time.sleep(1)
         ser.write_to_STM(("FR090").encode())
-        time.sleep(10)
-        ser.write_to_STM(("FW010").encode())
+        time.sleep(2)
