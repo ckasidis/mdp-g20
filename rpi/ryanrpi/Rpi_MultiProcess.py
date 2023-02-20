@@ -236,7 +236,7 @@ class MultiProcess:
 
     def _take_pic(self):
             # Start the Image Rec process
-            self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.13.21:5555') #Connection to Image Processing Server
+            self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
             while True:
                 try:
                     if not self.image_queue.empty():
