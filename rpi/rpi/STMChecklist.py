@@ -153,6 +153,18 @@ if __name__ == '__main__':
         if reply != "0": 
             ser.disconnect_STM() 
             break
+        
         ser.write_to_STM(("FW010").encode())
-        time.sleep(2000)
+        while True:
+            bytesToRead = ser1.inWaiting()
+            raw_dat = ser1.read(1)
+            dat = raw_dat.strip().decode()
+            if dat == 'R':
+                break
         ser.write_to_STM(("FR090").encode())
+        while True:
+            bytesToRead = ser1.inWaiting()
+            raw_dat = ser1.read(1)
+            dat = raw_dat.strip().decode()
+            if dat == 'R':
+                break
