@@ -144,6 +144,7 @@ if __name__ == '__main__':
     ser = STM()
 #    ser.__init__()
     ser.connect_STM()
+    ser1 = serial.Serial()
     
     
     print("entering loop")
@@ -152,11 +153,6 @@ if __name__ == '__main__':
         if reply != "0": 
             ser.disconnect_STM() 
             break
-        
         ser.write_to_STM(("FW010").encode())
-        while True:
-            stmreply = ser.read_from_STM()
-            if stmreply == 'R':
-                break;
-        
+        time.sleep(2000)
         ser.write_to_STM(("FR090").encode())
