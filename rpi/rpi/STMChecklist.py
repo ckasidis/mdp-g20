@@ -141,18 +141,18 @@ class STM:
 
 
 if __name__ == '__main__':
-    ser = STM()
+    img = STM()
 #    ser.__init__()
-    ser.connect_STM()
-    ser1 = serial.Serial()
+    img.connect_STM()
+    ser = serial.Serial()
     
     
     print("entering loop")
     while True:
-        reply = ser.take_image()
+        reply = img.take_image()
         print("Img server reply: " + reply)
         if reply != "0": 
-            ser.disconnect_STM() 
+            img.disconnect_STM() 
             break
         
         instr_list = [
@@ -161,9 +161,9 @@ if __name__ == '__main__':
         ]
         
         for instr in instr_list:
-            ser.write_to_STM(instr.encode())
+            img.write_to_STM(instr.encode())
             while True:
-                bytestoRead = ser.inwaiting()
+                bytestoRead = ser.inWaiting()
                 raw_dat=ser.read(1)
                 dat = raw_dat.strip().decode()
                 if dat == 'R':
