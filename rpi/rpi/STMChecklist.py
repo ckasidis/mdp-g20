@@ -157,7 +157,7 @@ if __name__ == '__main__':
         
         instr_list = [
             'FW025',
-            'FR090',
+            'FL090',
         ]
         
         for instr in instr_list:
