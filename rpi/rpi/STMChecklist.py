@@ -150,6 +150,7 @@ if __name__ == '__main__':
     print("entering loop")
     while True:
         reply = ser.take_image()
+        print("Img server reply: " + reply)
         if reply != "0": 
             ser.disconnect_STM() 
             break
