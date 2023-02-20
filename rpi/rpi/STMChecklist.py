@@ -156,6 +156,7 @@ if __name__ == '__main__':
     ser.connect_STM()
     
     ser.connect_to_imgsv()
+    print("entering loop")
     while True:
         reply = ser.take_image()
         if reply != "0": 
