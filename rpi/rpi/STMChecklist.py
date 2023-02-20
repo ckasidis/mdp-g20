@@ -163,8 +163,5 @@ if __name__ == '__main__':
         for instr in instr_list:
             img.write_to_STM(instr.encode())
             while True:
-                bytestoRead = ser.inWaiting()
-                raw_dat=ser.read(1)
-                dat = raw_dat.strip().decode()
-                if dat == 'R':
+                    time.sleep(1)
                     break
