@@ -144,6 +144,8 @@ if __name__ == '__main__':
     ser.connect_STM()
     
     ser.connect_to_imgsv()
+    IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
+    rpiName = socket.gethostname()
     print("entering loop")
     while True:
         reply = ser.take_image()
