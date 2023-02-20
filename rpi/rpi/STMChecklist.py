@@ -114,7 +114,9 @@ class STM:
         try:
             if self.IMG_sender is None:
                 print(' IMG is not connected. Trying to connect...')
-                self.connect_to_imgsv()
+                
+                self.IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
+                self.rpiName = socket.gethostname()
 
             camera = PiCamera(resolution=(640, 640))
             rawCapture = PiRGBArray(camera)
@@ -144,8 +146,6 @@ if __name__ == '__main__':
     ser.connect_STM()
     
     
-    IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
-    rpiName = socket.gethostname()
     print("entering loop")
     while True:
         reply = ser.take_image()
