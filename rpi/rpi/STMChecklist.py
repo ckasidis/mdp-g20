@@ -103,10 +103,10 @@ class STM:
     def connect_to_imgsv(self):
 
             
-        self.IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
+        self.IMG_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
         self.rpiName = socket.gethostname()
 
-        if self.IMAGE_sender is not None:
+        if self.IMG_sender is not None:
             print(self.rpiName,"connected to imgserver")
                     
 
@@ -115,7 +115,7 @@ class STM:
             if self.IMG_sender is None:
                 print(' IMG is not connected. Trying to connect...')
                 
-                self.IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
+                self.IMG_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
                 self.rpiName = socket.gethostname()
 
             camera = PiCamera(resolution=(640, 640))
@@ -127,7 +127,7 @@ class STM:
             rawCapture.truncate(0)
             print("trying to send image")
             print("rpiName: " + str(self.rpiName))
-            reply =self.IMG_sender.send_image(self.rpiName, image)
+            reply = self.IMG_sender.send_image(self.rpiName, image)
             print("Receiving reply")
             reply = str(reply.decode())
             camera.close()
