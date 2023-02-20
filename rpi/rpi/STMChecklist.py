@@ -155,6 +155,7 @@ if __name__ == '__main__':
             ser.disconnect_STM() 
             break
         
+        
         ser.write_to_STM(("FW010").encode())
         time.sleep(1)
         ser.write_to_STM(("FR090").encode())
