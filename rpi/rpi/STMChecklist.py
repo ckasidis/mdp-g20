@@ -152,5 +152,11 @@ if __name__ == '__main__':
         if reply != "0": 
             ser.disconnect_STM() 
             break
+        
         ser.write_to_STM(("FW010").encode())
+        while True:
+            stmreply = ser.read_from_STM()
+            if stmreply == 'R':
+                break;
+        
         ser.write_to_STM(("FR090").encode())
