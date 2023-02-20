@@ -156,10 +156,7 @@ if __name__ == '__main__':
             break
         
         ser.write_to_STM(("FW010").encode())
-        while True:
-            bytesToRead = ser1.in_waiting()
-            raw_dat = ser1.read(1)
-            dat = raw_dat.strip().decode()
-            if dat == 'R':
-                break
+        time.sleep(2)
         ser.write_to_STM(("FR090").encode())
+        time.sleep(2)
+        ser.write_to_STM(("FW010").encode())
