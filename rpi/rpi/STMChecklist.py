@@ -101,26 +101,14 @@ class STM:
             raise e
 
     def connect_to_imgsv(self):
-        while True:
-            retry = False
 
-            try:
-                self.IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
-                self.rpiName = socket.gethostname()
+            
+        self.IMAGE_sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555')
+        self.rpiName = socket.gethostname()
 
-                if self.IMAGE_sender is not None:
-                    print(self.rpiName,"connected to imgserver")
-                    retry = False
-
-            except Exception as e:
-                print('[IMGSERVER_ERROR] %s' % str(e))
-                retry = True
-
-            if not retry:
-                break
-
-            print('Retrying connection with IMGSV...')
-            time.sleep(1)
+        if self.IMAGE_sender is not None:
+            print(self.rpiName,"connected to imgserver")
+                    
 
     def take_image(self):
         try:
