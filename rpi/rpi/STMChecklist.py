@@ -155,8 +155,16 @@ if __name__ == '__main__':
             ser.disconnect_STM() 
             break
         
+        instr_list = [
+            'FW025',
+            'FR090',
+        ]
         
-        ser.write_to_STM(("FW010").encode())
-        time.sleep(1)
-        ser.write_to_STM(("FR090").encode())
-        time.sleep(2)
+        for instr in instr_list:
+            ser.write_to_STM(instr.encode())
+            while True:
+                bytestoRead = ser.inwaiting()
+                raw_dat=ser.read(1)
+                dat = raw_dat.strip().decode()
+                if dat == 'R':
+                    break
