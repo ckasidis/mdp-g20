@@ -101,7 +101,7 @@ class STM:
             raise e
 
     def connect_to_imgsv(self):
-        while True:
+        while not retry:
             retry = False
 
             try:
@@ -110,7 +110,7 @@ class STM:
 
                 if self.IMAGE_sender is not None:
                     print(self.rpiName,"connected to imgserver")
-                    retry = False
+                    break;
 
             except Exception as e:
                 print('[IMGSERVER_ERROR] %s' % str(e))
