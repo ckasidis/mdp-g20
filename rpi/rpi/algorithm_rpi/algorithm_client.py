@@ -126,7 +126,6 @@ if __name__ == '__main__':
                 writeMsg = "ALG|CMPLT"
                 ser.write_to_ALG(writeMsg.encode())
             
-            time.sleep(1)
             jsonMsg = ser.read_from_ALG()
             # msg = json.loads(jsonMsg)
             if jsonMsg is None:
@@ -134,7 +133,7 @@ if __name__ == '__main__':
                 ser.disconnect_all()
                 break
 
-            print(f"Command recevied from PC is {jsonMsg}\n")
+            print(f"Command received from PC : {jsonMsg}")
 
             
 

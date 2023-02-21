@@ -98,9 +98,9 @@ def runAlgorithm():
                 print(f"\nSending path commands to execute the command #{count}: {command} to RPI...")
                 client.send(command)
 
-                print("\nWaiting to receive aknowledgement/image_id from STM/IMAGE REC")
+                print("Waiting to receive aknowledgement")
                 var = client.receive()
-                print(f"Message received from STM(via RPi): {var}")
+                print(f"Message received (via RPi): {var}")
 
                 if var == stopword_from_STM:
                     continue
