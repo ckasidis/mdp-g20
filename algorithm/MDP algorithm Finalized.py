@@ -1,19 +1,101 @@
 import numpy as np
-# import matplotlib.pyplot as plt
-# from seaborn import heatmap
-# import networkx as nx
 import queue
-import tkinter as tk
-from tkinter import ttk
 
 import json
-file = "testing123.json"
+
+
+def ReadWriteConvert():
+    file = "AcquireFromAndriod.json"
+    maze = []
+    for i in range(22):
+        inner = []
+        for j in range(22):
+            if (i == 0 or i == 21):
+                inner.append(1)
+                continue
+            if (j == 0 or j == 21):
+                inner.append(1)
+                continue
+            inner.append(0)
+        maze.append(inner)
+
+    with open(file) as json_file:
+        obstacles = json.load(json_file)
+
+    GOALLIST = []
+    GOALLIST.append((2, 2, 'E'))
+    ObstacleList = []
+    # Convert the list of obstacles to fit the tree
+    for i in range(len(obstacles)):
+        obstacles[i][0] += 1
+        obstacles[i][1] += 1
+
+        if (obstacles[i][2] == "E"):
+            obstacles[i][2] = "S"
+
+        elif (obstacles[i][2] == "N"):
+            obstacles[i][2] = "E"
+
+        elif (obstacles[i][2] == "S"):
+            obstacles[i][2] = "W"
+
+        elif (obstacles[i][2] == "W"):
+            obstacles[i][2] = "N"
+
+    print(obstacles)
+
+    for i in range(len(obstacles)):
+        Direction = obstacles[i][2]
+        Xcoords = obstacles[i][0]
+        Ycoords = obstacles[i][1]
+        maze[Xcoords][Ycoords] = 1
+        if (Direction == "N"):
+            maze[Xcoords - 2][Ycoords] = 0.5
+            GOALLIST.append((Xcoords - 2, Ycoords, "S"))
+            ObstacleList.append((Xcoords - 1, Ycoords - 1, "N"))
+
+        elif (Direction == "S"):
+            maze[Xcoords + 2][Ycoords] = 0.5
+            GOALLIST.append((Xcoords + 2, Ycoords, "N"))
+            ObstacleList.append((Xcoords - 1, Ycoords - 1, "S"))
+
+        elif (Direction == "E"):
+            maze[Xcoords][Ycoords + 2] = 0.5
+            GOALLIST.append((Xcoords, Ycoords + 2, "W"))
+            ObstacleList.append((Xcoords - 1, Ycoords - 1, "E"))
+
+        elif (Direction == "W"):
+            maze[Xcoords][Ycoords - 2] = 0.5
+            GOALLIST.append((Xcoords, Ycoords - 2, "E"))
+            ObstacleList.append((Xcoords - 1, Ycoords - 1, "W"))
+
+        else:
+            ObstacleList.append((Xcoords - 1, Ycoords - 1, "NIL"))
+
+    print(ObstacleList)
+    print("Goallist=", GOALLIST)
+
+    maze = np.array(maze)
+
+    return maze, ObstacleList, GOALLIST
+
+
+
+def greedy_sort(coordinates):
+    path = []
+    current_point = coordinates[0]
+    while coordinates:
+        closest_point = min(coordinates, key=lambda x: ((x[0]-current_point[0])**2 + (x[1]-current_point[1])**2)**0.5)
+        path.append(closest_point)
+        current_point = closest_point
+        coordinates.remove(closest_point)
+    return path
+
 
 class MazeGraph(object):
     ''' Class to represent a Graph
         Construction : Using Edges
     '''
-
     def __init__(self):
         self.edges = {}  # why are edges dictionary?
 
@@ -46,23 +128,6 @@ def maze_to_graph(mazeGrid):
 
                 for d in directions:
                     neighbors = []
-                    #                 if (i> 1) and mazeGrid[i-2,j] != 1 and mazeGrid[i-2,j+1] !=1 and mazeGrid[i-2, j-1]!=1:  #if the mazegrid is top is not an obstacle
-                    #                     neighbors.append(((i-1,j), 1)) #append a tuple in a tuple to the neighbour
-
-                    #                 # Adjacent cell : Left
-                    #                 if (j> 1)  and mazeGrid[i,j-2] != 1 and mazeGrid[i-1, j-2] !=1 and mazeGrid[i+1, j-2]!=1:
-                    #                     neighbors.append(((i,j-1), 1))
-
-                    #                 # Adjacent cell : Bottom
-                    #                 if (i < height - 2)  and  mazeGrid[i+2,j] != 1 and mazeGrid[i+2,j+1] != 1 and mazeGrid[i+2,j-1] != 1:
-                    #                     neighbors.append(((i+1,j), 1))
-
-                    #                 # Adjacent cell : Right
-                    #                 if (j < width - 2)  and mazeGrid[i,j+2] != 1 and mazeGrid[i-1,j+2] != 1 and mazeGrid[i+1,j+2] != 1: #this check maybe out of range
-                    #                     neighbors.append(((i,j+1), 1))
-
-                    # moveforwardinthecurrentdirection.
-
                     if (d == "N"):
                         # move forward
                         if (i > 1) and mazeGrid[i - 2, j] != 1 and mazeGrid[i - 2, j + 1] != 1 and mazeGrid[
@@ -460,39 +525,6 @@ def maze_to_graph(mazeGrid):
 
     return mazeGraph
 
-def printBinaryMaze(mazeGrid):  # Passing the maze grid as a parameter
-    ''' Display the maze corresponding to a binary grid
-       Input : 2D NumPy array with 0 and 1 as elements
-       Output : Simple print of the corresponding maze
-   '''
-    (height, width) = mazeGrid.shape
-
-    print()
-    for i in range(height):
-        for j in range(width):
-            if mazeGrid[i, j] == 1:
-                print("\u25a9", end=" ")
-                # above generatres a block
-            elif mazeGrid[i, j] == 0:
-                print(".", end=" ")
-        print()
-
-
-
-
-
-def greedy_sort(coordinates):
-    path = []
-    current_point = coordinates[0]
-    while coordinates:
-        closest_point = min(coordinates, key=lambda x: ((x[0]-current_point[0])**2 + (x[1]-current_point[1])**2)**0.5)
-        path.append(closest_point)
-        current_point = closest_point
-        coordinates.remove(closest_point)
-    return path
-
-
-
 
 def heuristic(nodeA, nodeB):
     (xA, yA, AD) = nodeA  # gets the coodinates of X and Y of current node
@@ -546,9 +578,7 @@ def astar_search(mazeGraph, start, goal):
 
     return explored, pathcost, processed
 
-def write_json(data, filename="testing234.json"):
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=4)
+
 # Reconstruct the path from the Dict of explored nodes {node : parentNode}
 # Intuition : Backtrack from the goal node by checking successive parents
 def reconstruct_path(explored, start, goal):
@@ -590,104 +620,47 @@ def reconstruct_path(explored, start, goal):
     actions.reverse()
     return path, cantreachgoal, actions
 
-maze = []
-for i in range(22):
-    inner = []
-    for j in range(22):
-        if (i == 0 or i == 21):
-            inner.append(1)
-            continue
-        if (j == 0 or j == 21):
-            inner.append(1)
-            continue
-        inner.append(0)
-    maze.append(inner)
 
-GOALLIST = []
-GOALLIST.append((2, 2, 'E'))
-
-ObstacleList = []
-num = input("How many obstacles?")
-for i in range(int(num)):
-    Xcoords = int(input("Please Enter the obstacle X coords"))
-    Ycoords = int(input("Please Enter the obstacle Y coords"))
-    Direction = int(input("Please Enter the Image  of the Obstacle, 0: No image, 1: North, 2: South, 3: East, 4:West"))
-
-    # Xcoords == I, Ycoords == J
-
-    maze[Xcoords][Ycoords] = 1
-    if (Direction == 1):
-        maze[Xcoords - 2][Ycoords] = 0.5
-        GOALLIST.append((Xcoords - 2, Ycoords, "S"))
-        ObstacleList.append((Xcoords - 1, Ycoords - 1, "N"))
-
-    elif (Direction == 2):
-        maze[Xcoords + 2][Ycoords] = 0.5
-        GOALLIST.append((Xcoords + 2, Ycoords, "N"))
-        ObstacleList.append((Xcoords - 1, Ycoords - 1, "S"))
-
-    elif (Direction == 3):
-        maze[Xcoords][Ycoords + 2] = 0.5
-        GOALLIST.append((Xcoords, Ycoords + 2, "W"))
-        ObstacleList.append((Xcoords - 1, Ycoords - 1, "E"))
-
-    elif (Direction == 4):
-        maze[Xcoords][Ycoords - 2] = 0.5
-        GOALLIST.append((Xcoords, Ycoords - 2, "E"))
-        ObstacleList.append((Xcoords - 1, Ycoords - 1, "W"))
-
-    else:
-        ObstacleList.append((Xcoords - 1, Ycoords - 1, "NIL"))
-
-for i in range(len(maze)):
-    print(maze[i], '\n')
-
-print(GOALLIST)
-print(ObstacleList)
-# Convert to a NumPy array
-maze = np.array(maze)
-GOALLIST = greedy_sort(GOALLIST)
-mazegraph = maze_to_graph(maze)
-
-cantreachgoal = False
-# Run the A*S algorithm for path finding
-lol = []
-FinalActions = []
-for i in range(len(GOALLIST) - 1):
-    if cantreachgoal == True:
-        BT = lol[i - 1][-2]
-        nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=BT, goal=GOALLIST[i + 1])
-        path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=BT, goal=GOALLIST[i + 1])
-    else:
-        nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
-        path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=GOALLIST[i + 1])
-
-    lol.append(path)
-    FinalActions += actions
-    #     print(lol)
-    print("path", i, "=", path)
-
-# i=0
-# nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start = GOALLIST[i] , goal = GOALLIST[i+1])
-# path, cantreachgoal = reconstruct_path(nodesExplored, start = GOALLIST[i], goal = GOALLIST[i+1])
+def write_json(data, filename="testing234.json"):
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
 
 
-# Basic measures for the algorithm
-print("A*-Search (A*S)")
-print()
+def finalmain():
 
-totalNodes = np.count_nonzero(maze == 0)
-print("Total nodes in maze :", totalNodes)
-print("Total nodes visited :", nodesProcessed, " | ", np.round(100 * (nodesProcessed / totalNodes), 2), "%")
-print("Final path distance :", len(path))
-print()
+    maze, ObstacleList, GOALLIST = ReadWriteConvert()
 
-# Print the path and show using helper functions
-print("Path through the Maze :", lol)
-print("Actions throught the Maze", FinalActions)
-# showBinaryMazePath(maze, lol)
-# showBinaryMazePath(maze, path)
+    GOALLIST  = greedy_sort(GOALLIST)
+    print(ObstacleList)
+    ### Convert the maze to a graph
+    mazegraph = maze_to_graph(maze)
 
+    # Print the edges with weights
+    mazegraph.all_edges()
 
-data = FinalActions
-write_json(data)
+    ActionsWCamera = []
+    cantreachgoal = False
+    # Run the A*S algorithm for path finding
+    lol = []
+    FinalActions = []
+    for i in range(len(GOALLIST) - 1):
+        if cantreachgoal == True:
+            BT = lol[i - 1][-2]
+            nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=BT, goal=GOALLIST[i + 1])
+            path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=BT, goal=GOALLIST[i + 1])
+        else:
+            nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
+            path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=GOALLIST[i + 1])
+
+        lol.append(path)
+        FinalActions += actions
+        #     print(lol)
+        #print("path", i, "=", path)
+        ActionsWCamera += actions
+        ActionsWCamera.append('Camera')
+
+    print("Actions sent with Camera", ActionsWCamera)
+    data = ActionsWCamera
+    write_json(data)
+
+finalmain()
