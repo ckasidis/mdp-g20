@@ -6,7 +6,7 @@ import numpy as np
 
 WIFI_IP = "192.168.20.1"
 WIFI_PORT = 3004
-ALGORITHM_SOCKET_BUFFER_SIZE = 1024
+ALGORITHM_SOCKET_BUFFER_SIZE = 10
 
 # To be there on RPi.
 
@@ -83,8 +83,8 @@ class Algo:
 
     def read_from_ALG(self):
         try:
-            msg = self.client.recv()
-            # msg = self.client.recv(ALGORITHM_SOCKET_BUFFER_SIZE)
+            # msg = self.client.recv()
+            msg = self.client.recv(ALGORITHM_SOCKET_BUFFER_SIZE)
             data = msg.decode()
             # Converting the string to an array
             # arr = np.array(data.split(','), dtype=np.int)
