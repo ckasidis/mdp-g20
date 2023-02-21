@@ -48,7 +48,7 @@ def fixCommands(commands):
     cmds=[]
     for i in commands:
         if i=='Camera':
-            cmds.append("RPI|TOCAM"+i)
+            cmds.append("RPI|TOCAM")
         else:
             cmds.append("STM|"+i)
     return cmds

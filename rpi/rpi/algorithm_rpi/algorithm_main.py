@@ -108,7 +108,7 @@ def runAlgorithm():
                 #     print("Received a strange message from RPi, please cross-check.")
             
             # client.close()
-            break
+            # break
             
             '''
             # IF SENDING THE ENTIRE ARRAY AT ONCE
@@ -126,7 +126,7 @@ def runAlgorithm():
             client.close()
             break
 
-    client.close()
+    # client.close()
 
 # Run the system
 if __name__ =='__main__':
