@@ -121,9 +121,9 @@ if __name__ == '__main__':
                 data = obstacles.encode()
                 ser.write_to_ALG(data)
                 count+=1
-            else:
-                writeMsg = "ALG|CMPLT"
-                ser.write_to_ALG(writeMsg.encode())
+            # else:
+            #     writeMsg = "ALG|CMPLT"
+            #     ser.write_to_ALG(writeMsg.encode())
 
             jsonMsg = ser.read_from_ALG()
             # msg = json.loads(jsonMsg)
