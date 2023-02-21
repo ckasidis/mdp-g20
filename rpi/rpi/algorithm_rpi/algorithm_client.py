@@ -90,8 +90,8 @@ class Algo:
 
             print("Received command:", data)
 
-            if len(arr) > 0:
-                return arr
+            if len(data) > 0:
+                return data
 
             return None
 
