@@ -86,9 +86,9 @@ class Algo:
             msg = self.client.recv(ALGORITHM_SOCKET_BUFFER_SIZE)
             data = msg.decode()
             # Converting the string to an array
-            arr = np.array(data.split(','), dtype=np.int)
+            # arr = np.array(data.split(','), dtype=np.int)
 
-            print("Received array:", arr)
+            print("Received command:", arr)
 
             if len(arr) > 0:
                 return arr

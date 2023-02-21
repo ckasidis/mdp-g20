@@ -4,6 +4,47 @@ import json
 
 # Custom imports
 from algorithm_utils import main, fixCommands
+from re import M
+import socket
+import json
+
+
+class Client:
+    """
+    Used as the client for RPI.
+    """
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.socket = socket.socket()
+    
+    def connect(self):
+        print("=================================Connection=================================")
+        print(f"Attempting connection to ALGO at {self.host}:{self.port}")
+        self.socket.connect((self.host, self.port))
+        print("Connected to ALGO!")
+
+    def send(self, d):
+        data = d.encode()
+        self.socket.send(data)
+
+    def receive(self):
+        msg = self.socket.recv(1024)
+        data = msg.decode()
+        return(data)
+
+    def is_json(self, msg):
+        try:
+            data = json.loads(msg)
+            d = data["obstacle1"]
+            return data
+        except Exception:
+            print("exception occured")
+            return False
+
+    def close(self):
+        print("Closing client socket.")
+        self.socket.close()
 
 def testAlgorithm():
     filename1 = 'AcquirefromAndroid.json'
@@ -35,7 +76,7 @@ def runAlgorithm():
             print("Waiting to receive obstacle data from ANDROID...")
             
             obstacle_data = client.receive() # Receive the obstacle data
-            data2 = obstacle_data.decode() # Parse data from binary to JSON
+            data2 = obstacle_data # Parse data from binary to JSON
 
             print("Received all obstacles data from ANDROID.")
             print(f"Obstacles data: {data2}")
@@ -73,8 +114,9 @@ def runAlgorithm():
             print("Sent the commands (as an array) to RPi")
             '''
 
-        except exception as e:
+        except Exception as e:
             print('[MAIN CONNECT FUNCTION ERROR]',str(e))
+            break
 
 # Run the system
 if __name__ =='__main__':
