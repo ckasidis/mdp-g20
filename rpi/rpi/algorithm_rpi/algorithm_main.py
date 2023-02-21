@@ -53,18 +53,17 @@ def runAlgorithm():
             
 
             for command in commands: # IF SENDING ONE BY ONE
-                command = 'STM|'+command
                 print(f"\nSending path commands to execute the command {command} to RPI to STM...")
                 client.send(command)
 
-                print("\nWaiting to receive aknowledgement/image_id from STM/IMAGE REC")
-                var = client.receive()
-                print(f"Message received from STM(via RPi): {var}")
+                # print("\nWaiting to receive aknowledgement/image_id from STM/IMAGE REC")
+                # var = client.receive()
+                # print(f"Message received from STM(via RPi): {var}")
 
-                if var == stopword_from_STM:
-                    continue
-                else:
-                    print("Received a strange message from RPi, please cross-check.")
+                # if var == stopword_from_STM:
+                #     continue
+                # else:
+                #     print("Received a strange message from RPi, please cross-check.")
 
             
             '''
@@ -79,5 +78,5 @@ def runAlgorithm():
 
 # Run the system
 if __name__ =='__main__':
-    # runAlgorithm()
-    testAlgorithm()
+    runAlgorithm()
+    # testAlgorithm()
