@@ -6,7 +6,7 @@ import numpy as np
 
 WIFI_IP = "192.168.20.1"
 WIFI_PORT = 3004
-ALGORITHM_SOCKET_BUFFER_SIZE = 10
+ALGORITHM_SOCKET_BUFFER_SIZE = 9
 
 # To be there on RPi.
 
