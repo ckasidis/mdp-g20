@@ -127,7 +127,14 @@ if __name__ == '__main__':
             time.sleep(1)
             jsonMsg = ser.read_from_ALG()
             # msg = json.loads(jsonMsg)
+            if jsonMsg is None:
+                ser.disconnect_ALG()
+                ser.disconnect_all()
+                break
+            
             print(f"Command recevied from PC is {jsonMsg}")
+
+            
 
 
         except KeyboardInterrupt:

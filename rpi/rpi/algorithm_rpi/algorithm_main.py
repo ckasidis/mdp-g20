@@ -92,9 +92,10 @@ def runAlgorithm():
 
             print("\n\n=======================Send path commands to move to obstacles=======================\n")
             
-
+            count=0
             for command in commands: # IF SENDING ONE BY ONE
-                print(f"\nSending path commands to execute the command {command} to RPI to STM...")
+                count+=1
+                print(f"\nSending path commands to execute the command #{count}: {command} to RPI...")
                 client.send(command)
 
                 # print("\nWaiting to receive aknowledgement/image_id from STM/IMAGE REC")
@@ -105,8 +106,9 @@ def runAlgorithm():
                 #     continue
                 # else:
                 #     print("Received a strange message from RPi, please cross-check.")
-
-            # client.close()
+            
+            client.close()
+            break
             
             '''
             # IF SENDING THE ENTIRE ARRAY AT ONCE
@@ -115,8 +117,13 @@ def runAlgorithm():
             print("Sent the commands (as an array) to RPi")
             '''
 
+        except KeyboardInterrupt:
+            client.close()
+            break
+
         except Exception as e:
             print('[MAIN CONNECT FUNCTION ERROR]',str(e))
+            client.close()
             break
 
 # Run the system
