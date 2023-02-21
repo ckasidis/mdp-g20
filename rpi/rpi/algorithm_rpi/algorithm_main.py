@@ -106,6 +106,7 @@ def runAlgorithm():
                 # else:
                 #     print("Received a strange message from RPi, please cross-check.")
 
+            client.close()
             
             '''
             # IF SENDING THE ENTIRE ARRAY AT ONCE

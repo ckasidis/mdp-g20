@@ -88,7 +88,7 @@ class Algo:
             # Converting the string to an array
             # arr = np.array(data.split(','), dtype=np.int)
 
-            print("Received command:", arr)
+            print("Received command:", data)
 
             if len(arr) > 0:
                 return arr
