@@ -3,7 +3,7 @@ import numpy as np
 import json
 
 # Custom imports
-from algorithm_utils import main
+from algorithm_utils import main, fixCommands
 
 def testAlgorithm():
     filename1 = 'AcquirefromAndroid.json'
@@ -45,7 +45,7 @@ def runAlgorithm():
 
             print("\n===============================Calculate path===============================\n")
             commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
-
+            commands = fixCommands(commands)
             print("\nFull list of paths commands till last obstacle:")
             print(f"{commands}") # View the commands/actions generated
 
