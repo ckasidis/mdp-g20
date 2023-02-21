@@ -78,15 +78,19 @@ def ReadWriteConvert(filename = "AcquireFromAndriod.json"):
     obstacles=[]
     with open(filename) as json_file:
         data = json.load(json_file)
-        obs = data.replace("ALGO|", "")
-        obs = obs[1:len(obstacles)-1]
+        # obs = data.replace("ALGO|", "")
+        obs = data[1:len(obstacles)-1]
         obs = obs.split(', ')
+        # print(obs)
 
         for ob in obs:
             obj = ob[1:-1]
             obj = obj.split(',')
             obj[0] = int(obj[0])
             obj[1] = int(obj[1])
+            # print(obj)
+            obj[2] = obj[2][0]
+            # print(obj[2][0])
             obstacles.append(obj)
 
     # print(obstacles)
@@ -168,85 +172,95 @@ def astar_search(mazeGraph, start, goal):
         Input  : Graph with the start and goal vertices
         Output : Dict of explored vertices in the graph
     '''
-    frontier = queue.PriorityQueue()  # Priority Queue for Frontier
+    try:
+        frontier = queue.PriorityQueue()  # Priority Queue for Frontier
 
-    # initialization
-    frontier.put((0, start))  # Add the start node to frontier with priority 0
-    explored = {}  # Dict of explored nodes {node : parentNode}
-    explored[start] = None  # start node has no parent node
-    pathcost = {}  # Dict of cost from start to node
-    pathcost[start] = 0  # start to start cost should be 0
-    processed = 0  # Count of total nodes processed
+        # initialization
+        frontier.put((0, start))  # Add the start node to frontier with priority 0
+        explored = {}  # Dict of explored nodes {node : parentNode}
+        explored[start] = None  # start node has no parent node
+        pathcost = {}  # Dict of cost from start to node
+        pathcost[start] = 0  # start to start cost should be 0
+        processed = 0  # Count of total nodes processed
 
-    while not frontier.empty():
-        currentNode = frontier.get()[1]
-        processed += 1
+        while not frontier.empty():
+            currentNode = frontier.get()[1]
+            processed += 1
 
-        # stop when goal is reached
-        if currentNode == goal:
-            break
+            # stop when goal is reached
+            if currentNode == goal:
+                break
 
-        # explore every single neighbor of current node
-        for nextNode, weight, action in mazeGraph.neighbors(currentNode):
+            # explore every single neighbor of current node
+            for nextNode, weight, action in mazeGraph.neighbors(currentNode):
 
-            # compute the new cost for the node based on the current node/ Calculating g(n)
-            newcost = pathcost[currentNode] + weight
+                # compute the new cost for the node based on the current node/ Calculating g(n)
+                newcost = pathcost[currentNode] + weight
 
-            if (nextNode not in explored) or (
-                    newcost < pathcost[nextNode]):  # if the newcost is smaller then the nextNode
-                # priority= #f(n) = h(n) + g(n);
-                priority = heuristic(nextNode, goal) + newcost
-                # put new node in frontier with priority
-                frontier.put((priority, nextNode))
+                if (nextNode not in explored) or (
+                        newcost < pathcost[nextNode]):  # if the newcost is smaller then the nextNode
+                    # priority= #f(n) = h(n) + g(n);
+                    priority = heuristic(nextNode, goal) + newcost
+                    # put new node in frontier with priority
+                    frontier.put((priority, nextNode))
 
-                # Stores the parent node of the nextnode into explored
-                explored[nextNode] = currentNode, action
+                    # Stores the parent node of the nextnode into explored
+                    explored[nextNode] = currentNode, action
 
-                # updates g(n) for the nextNode
-                pathcost[nextNode] = newcost
+                    # updates g(n) for the nextNode
+                    pathcost[nextNode] = newcost
 
-    return explored, pathcost, processed
+        return explored, pathcost, processed
+    except Exception as e:
+        print('[ASTAR SEARCH ERROR]',str(e))
 
 # Reconstruct the path from the Dict of explored nodes {node : parentNode}
 # Intuition : Backtrack from the goal node by checking successive parents
 def reconstruct_path(explored, start, goal):
-    currentNode = goal  # start at the goal node
-    path = []  # initiate the blank path
-    actions = []
-    direction = ['N', 'S', 'E', 'W']
-    cantreachgoal = False
-    # stop when backtrack reaches start node
-    actions += explored[currentNode][1]
-    while currentNode != start:
-        # grow the path backwards and backtrack
-        flag = 0
-        path.append(currentNode)
-        try:
-            currentNode = explored[currentNode][0]
-        except KeyError:
-            num = direction.index(currentNode[2])
-            if num == 3:
-                num = -1
-            currentNode = (currentNode[0], currentNode[1], direction[num + 1])
-            cantreachgoal = True
+    try:
+        currentNode = goal  # start at the goal node
+        path = []  # initiate the blank path
+        actions = []
+        direction = ['N', 'S', 'E', 'W']
+        cantreachgoal = False
+        # stop when backtrack reaches start node
+        actions += explored[currentNode][1] 
+        while currentNode != start:
+            # grow the path backwards and backtrack
             flag = 0
-
-        if (flag == 0):
+            path.append(currentNode)
             try:
-                actions += explored[currentNode][1]
-            except TypeError:
+                currentNode = explored[currentNode][0]
+            except KeyError:
+                num = direction.index(currentNode[2])
+                if num == 3:
+                    num = -1
+                currentNode = (currentNode[0], currentNode[1], direction[num + 1])
+                cantreachgoal = True
+                flag = 0
+
+            if (flag == 0):
+                try:
+                    actions += explored[currentNode][1]
+                except TypeError:
+                    continue
+            else:
                 continue
-        else:
-            continue
 
-            # Try Changing to left or right
-        # currentNode = explored[currentNode]
-    path.append(start)  # append start node for completeness
-    path.reverse()  # reverse the path from start to goal
+                # Try Changing to left or right
+            # currentNode = explored[currentNode]
+        
+        path.append(start)  # append start node for completeness
+        path.reverse()  # reverse the path from start to goal
 
-    actions.append
-    actions.reverse()
-    return path, cantreachgoal, actions
+        actions.append
+        actions.reverse()
+
+        return path, cantreachgoal, actions
+
+    except Exception as e:
+        print("[RECONSTRUCTPATH ERROR]",str(e))
+        # raise e
 
 # Function to convert a maze to a graph
 def maze_to_graph(mazeGrid):

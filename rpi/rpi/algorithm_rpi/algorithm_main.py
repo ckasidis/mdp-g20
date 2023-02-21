@@ -49,13 +49,17 @@ class Client:
 def testAlgorithm():
     filename1 = 'AcquirefromAndroid.json'
     filename2 = 'commands2stm.json'
-    commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
+    try:
+        commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
+        for i in commands:
+            if i=='Camera':
+                print("\nRPI|"+i)
+            else:
+                print("\nSTM|"+i)
     # print(commands)
-    for i in commands:
-        if i=='Camera':
-            print("\nRPI|"+i)
-        else:
-            print("\nSTM|"+i)
+    except:
+        print('[ALGO ERROR]')
+    
 
 def runAlgorithm():
     try:
@@ -130,5 +134,5 @@ def runAlgorithm():
 
 # Run the system
 if __name__ =='__main__':
-    runAlgorithm()
-    # testAlgorithm()
+    # runAlgorithm()
+    testAlgorithm()
