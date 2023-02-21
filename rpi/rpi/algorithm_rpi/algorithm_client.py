@@ -88,7 +88,7 @@ class Algo:
             # Converting the string to an array
             # arr = np.array(data.split(','), dtype=np.int)
 
-            print("Received command:", data)
+            # print("Received command:", data)
 
             if len(data) > 0:
                 return data
@@ -126,8 +126,9 @@ if __name__ == '__main__':
                 ser.write_to_ALG(writeMsg.encode())
 
             jsonMsg = ser.read_from_ALG()
-            msg = json.loads(jsonMsg)
-            print(f"Command recevied from PC is {msg}")
+            # msg = json.loads(jsonMsg)
+            time.sleep(1)
+            print(f"Command recevied from PC is {jsonMsg}")
 
 
         except KeyboardInterrupt:
