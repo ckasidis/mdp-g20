@@ -131,8 +131,8 @@ if __name__ == '__main__':
                 ser.disconnect_ALG()
                 ser.disconnect_all()
                 break
-            
-            print(f"Command recevied from PC is {jsonMsg}")
+
+            print(f"Command recevied from PC is {jsonMsg}\n")
 
             
 

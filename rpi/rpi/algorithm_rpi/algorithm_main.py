@@ -107,7 +107,7 @@ def runAlgorithm():
                 # else:
                 #     print("Received a strange message from RPi, please cross-check.")
             
-            client.close()
+            # client.close()
             break
             
             '''
@@ -125,6 +125,8 @@ def runAlgorithm():
             print('[MAIN CONNECT FUNCTION ERROR]',str(e))
             client.close()
             break
+
+    client.close()
 
 # Run the system
 if __name__ =='__main__':
