@@ -20,14 +20,14 @@
     "STM|FW010",
     "STM|FW010",
     "STM|FL090",
-    "RPI|TOCAMCamera",
+    "RPI|TOCAM",
     "STM|BW010",
     "STM|BW010",
     "STM|BW010",
     "STM|BW010",
     "STM|FL090",
     "STM|FL090",
-    "RPI|TOCAMCamera",
+    "RPI|TOCAM",
     "STM|BL090",
     "STM|BW010",
     "STM|BW010",
@@ -57,5 +57,5 @@
     "STM|BR090",
     "STM|FW010",
     "STM|FW010",
-    "RPI|TOCAMCamera"
+    "RPI|TOCAM"
 ]

@@ -117,14 +117,15 @@ if __name__ == '__main__':
     count = 1
     while True: 
         try:            
-            # if(count == 1):
-            obstacles = "ALGO|[[2,8,S], [6,12,N], [8,5,E], [15,16,S], [16,1,W]]"
-            data = obstacles.encode()
-            ser.write_to_ALG(data)
-            count+=1
-            # else:
-            #     writeMsg = "ALG|CMPLT"
-            #     ser.write_to_ALG(writeMsg.encode())
+            if(count == 1):
+                obstacles = "ALGO|[[2,8,S], [6,12,N], [8,5,E], [15,16,S], [16,1,W]]"
+                data = obstacles.encode()
+                ser.write_to_ALG(data)
+                count+=1
+            else:
+                writeMsg = "ALG|CMPLT"
+                ser.write_to_ALG(writeMsg.encode())
+            
             time.sleep(1)
             jsonMsg = ser.read_from_ALG()
             # msg = json.loads(jsonMsg)
