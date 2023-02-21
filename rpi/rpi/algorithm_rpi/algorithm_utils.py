@@ -6,43 +6,46 @@ import json
 # Main driver function
 def main(map_dir, cmd_dir):
     ''' Main driver/wrapper function to execute all all sub functions'''
-    filename1=map_dir
-    filename2=cmd_dir
-    maze, ObstacleList, GOALLIST = ReadWriteConvert(filename1)
+    try:
+        filename1=map_dir
+        filename2=cmd_dir
+        maze, ObstacleList, GOALLIST = ReadWriteConvert(filename1)
 
-    GOALLIST  = greedy_sort(GOALLIST)
-    # print(ObstacleList)
-    ### Convert the maze to a graph
-    mazegraph = maze_to_graph(maze)
+        GOALLIST  = greedy_sort(GOALLIST)
+        # print(ObstacleList)
+        ### Convert the maze to a graph
+        mazegraph = maze_to_graph(maze)
 
-    # Print the edges with weights
-    mazegraph.all_edges()
+        # Print the edges with weights
+        mazegraph.all_edges()
 
-    ActionsWCamera = []
-    cantreachgoal = False
-    # Run the A*S algorithm for path finding
-    lol = []
-    FinalActions = []
-    for i in range(len(GOALLIST) - 1):
-        if cantreachgoal == True:
-            BT = lol[i - 1][-2]
-            nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=BT, goal=GOALLIST[i + 1])
-            path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=BT, goal=GOALLIST[i + 1])
-        else:
-            nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
-            path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=GOALLIST[i + 1])
+        ActionsWCamera = []
+        cantreachgoal = False
+        # Run the A*S algorithm for path finding
+        lol = []
+        FinalActions = []
+        for i in range(len(GOALLIST) - 1):
+            if cantreachgoal == True:
+                BT = lol[i - 1][-2]
+                nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=BT, goal=GOALLIST[i + 1])
+                path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=BT, goal=GOALLIST[i + 1])
+            else:
+                nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
+                path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=GOALLIST[i + 1])
 
-        lol.append(path)
-        FinalActions += actions
-        # print(lol)
-        # print("path", i, "=", path)
-        ActionsWCamera += actions
-        ActionsWCamera.append('Camera')
+            lol.append(path)
+            FinalActions += actions
+            # print(lol)
+            # print("path", i, "=", path)
+            ActionsWCamera += actions
+            ActionsWCamera.append('Camera')
 
-    # print("Actions sent with Camera", ActionsWCamera)
-    data = ActionsWCamera
-    write_json(data, filename=filename2)
-    return data
+        # print("Actions sent with Camera", ActionsWCamera)
+        data = ActionsWCamera
+        write_json(data, filename=filename2)
+        return data
+    except Exception as e:
+        print('[PATH MAIN FUNC ERROR]', str(e))
 
 def fixCommands(commands):
     cmds=[]
