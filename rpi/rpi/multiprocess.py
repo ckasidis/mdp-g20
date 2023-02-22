@@ -16,8 +16,8 @@ import imagezmq
 from picamera.array import PiRGBArray
 
 init(autoreset=True)
-#print(sys.version)
-#print(sys.path)
+# print(sys.version)
+# print(sys.path)
 
 class MultiProcess:
     def __init__(self):
@@ -126,7 +126,7 @@ class MultiProcess:
 
                         messages = msg.split('|', 1)
 
-                        # Message format for Image Rec: RPI|
+                        # Message format for Image Rec: RPI|TOCAM
                         if messages[0] == 'RPI':
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
                             self.image_queue.put_nowait('take')
