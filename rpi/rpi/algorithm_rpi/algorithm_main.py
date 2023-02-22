@@ -72,7 +72,7 @@ def runAlgorithm():
 
     filename1 = 'mapFromAndroid.json'
     filename2 = 'commands2stm.json'
-    stopword_from_STM = 'ALG|CMPLT'
+    stopword_from_STM = 'CMPLT'
 
     while True:
         try:
