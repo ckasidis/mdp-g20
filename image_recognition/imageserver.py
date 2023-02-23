@@ -75,6 +75,7 @@ while True:
     #frame = imutils.resize(frame, width=640)
     resized = cv2.resize(frame,(640,640))
     (h, w) = resized.shape[:2]
+    cv2.imwrite('frame.png')
 
     #frame = imutils.resize(frame, width=400)
     #set confidence for model 

@@ -3,6 +3,13 @@ import numpy as np
 import queue
 import json
 
+
+from colorama import *
+init(autoreset=True)
+# print(sys.version)
+# print(sys.path)
+
+
 # Main driver function
 def main(map_dir, cmd_dir):
     ''' Main driver/wrapper function to execute all all sub functions'''
