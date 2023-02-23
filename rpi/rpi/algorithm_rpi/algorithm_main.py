@@ -9,6 +9,12 @@ import socket
 import json
 
 
+from colorama import *
+init(autoreset=True)
+# print(sys.version)
+# print(sys.path)
+
+
 class Client:
     """
     Used as the client for RPI.
@@ -22,7 +28,7 @@ class Client:
         print("=================================Connection=================================")
         print(f"Attempting connection to ALGO at {self.host}:{self.port}")
         self.socket.connect((self.host, self.port))
-        print("Connected to ALGO!")
+        print(Fore.LIGHTGREEN_EX + "Connected to ALGO!")
 
     def send(self, d):
         data = d.encode()
@@ -39,14 +45,16 @@ class Client:
             d = data["obstacle1"]
             return data
         except Exception:
-            print("exception occured")
+            print(Fore.RED + "Exception occured")
             return False
 
     def close(self):
-        print("Closing client socket.")
+        print(Fore.LIGHTCYAN_EX + "Closing client socket.")
         self.socket.close()
 
 def testAlgorithm():
+
+    ''' Obselete function'''
     filename1 = 'AcquirefromAndroid.json'
     filename2 = 'commands2stm.json'
     try:
@@ -58,7 +66,7 @@ def testAlgorithm():
                 print("\nSTM|"+i)
     # print(commands)
     except:
-        print('[ALGO ERROR]')
+        print(Fore.RED + '[ALGO ERROR]')
     
 
 def runAlgorithm():
@@ -66,9 +74,10 @@ def runAlgorithm():
         # Create a client to send and receive information from the RPi
         client = Client("192.168.20.1", 3004)  # 10.27.146 139 | 192.168.13.1
         client.connect()
-        print("Algorithm PC successfully connected to Raspberry Pi")
+        print(Fore.LIGHTGREEN_EX + "Algorithm PC successfully connected to Raspberry Pi...")
+
     except Exception as e:
-        print("[ALG-CONNECTION ERROR]",str(e))
+        print(Fore.RED + "[ALG-CONNECTION ERROR]",str(e))
 
     filename1 = 'mapFromAndroid.json'
     filename2 = 'commands2stm.json'
@@ -82,34 +91,37 @@ def runAlgorithm():
             obstacle_data = client.receive() # Receive the obstacle data
             data2 = obstacle_data # Parse data from binary to JSON
 
-            print("Received all obstacles data from ANDROID.")
-            print(f"Obstacles data: {data2}")
+            print(Fore.LIGHTGREEN_EX + "Received all obstacles data from ANDROID.")
+            print(Fore.LIGHTCYAN_EX + f"Obstacles data: {data2}")
             
             with open(filename1, "w") as f: # Store the data in a json file
                 json.dump(data2, f, indent=4)
 
             print("\n===============================Calculate path===============================\n")
+            print(Fore.LIGHTCYAN_EX + "Running the algorithm....")
             commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
+            print(Fore.LIGHTGREEN_EX + "The algorithm has completed computation, generating STM commands...")
             commands = fixCommands(commands)
-            print("\nFull list of paths commands till last obstacle:")
-            print(f"{commands}") # View the commands/actions generated
+            print("\nFull list of STM commands till last obstacle:")
+            print(f'{commands}') # View the commands/actions generated
 
             print("\n\n=======================Send path commands to move to obstacles=======================\n")
             
             count=0
             for command in commands: # IF SENDING ONE BY ONE
                 count+=1
-                print(f"\nSending path commands to execute the command #{count}: {command} to RPI...")
+                print(f"\nSending path commands to execute the command #{count} to RPI to STM...")
                 client.send(command)
 
                 print("Waiting to receive aknowledgement")
                 var = client.receive()
-                print(f"Message received (via RPi): {var}")
+                # print(f"Message received (via RPi): {var}")
 
                 if var == stopword_from_STM:
+                    print(Fore.LIGHTGREEN_EX + f"Acknowledgement received successfully, sending next command {command}...")
                     continue
                 else:
-                    print("Received a strange message from RPi, please cross-check.")
+                    print(Fore.RED + "Received a strange message from RPi, please cross-check.")
             
             # client.close()
             # break
@@ -126,7 +138,7 @@ def runAlgorithm():
             break
 
         except Exception as e:
-            print('[MAIN CONNECT FUNCTION ERROR]',str(e))
+            print(Fore.RED + '[MAIN CONNECT FUNCTION ERROR]',str(e))
             client.close()
             break
 

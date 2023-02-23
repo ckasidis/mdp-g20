@@ -45,18 +45,17 @@ def main(map_dir, cmd_dir):
         write_json(data, filename=filename2)
         return data
     except Exception as e:
-        print('[PATH MAIN FUNC ERROR]', str(e))
+        print(Fore.RED + '[PATH MAIN FUNC ERROR]', str(e))
 
 def fixCommands(commands):
     cmds=[]
     for i in commands:
         if i=='Camera':
-            cmds.append("RPI|TOCAM")
+            cmds.append("RPI|TOCAM") # keyword for camera
         else:
             cmds.append("STM|"+i)
 
-
-    cmds.append("RPI_END")
+    cmds.append("RPI_END|0") # add stop word
     return cmds
 
 def write_json(data, filename="testing.json"):
@@ -215,7 +214,7 @@ def astar_search(mazeGraph, start, goal):
 
         return explored, pathcost, processed
     except Exception as e:
-        print('[ASTAR SEARCH ERROR]',str(e))
+        print(Fore.RED + '[ASTAR SEARCH ERROR]',str(e))
 
 # Reconstruct the path from the Dict of explored nodes {node : parentNode}
 # Intuition : Backtrack from the goal node by checking successive parents
@@ -262,7 +261,7 @@ def reconstruct_path(explored, start, goal):
         return path, cantreachgoal, actions
 
     except Exception as e:
-        print("[RECONSTRUCTPATH ERROR]",str(e))
+        print(Fore.RED + "[RECONSTRUCTPATH ERROR]",str(e))
         # raise e
 
 # Function to convert a maze to a graph
