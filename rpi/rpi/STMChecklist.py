@@ -88,6 +88,16 @@ class STM:
             print('[STM-WRITE Error] %s' % str(e))
             raise e
         
+    def move(self, instr_list):
+        for instr in instr_list:
+            self.write_to_STM(instr.encode())
+            while True:
+                raw_dat = self.STM_connection.read(1)
+                dat = raw_dat.strip().decode()
+                print(raw_dat)
+                if dat == 'R':
+                    break
+
     def write_to_STM_test(message):
         try:
 
@@ -141,27 +151,28 @@ class STM:
 
 
 if __name__ == '__main__':
-    img = STM()
-#    ser.__init__()
-    img.connect_STM()
+        
+    stm = STM()
+    stm.connect_STM()
     ser = serial.Serial()
     
-    
-    print("entering loop")
-    while True:
-        reply = img.take_image()
-        print("Img server reply: " + reply)
-        if reply != "0": 
-            img.disconnect_STM() 
-            break
+    instr_list = ['FW025', 'FR090', 'BW030']
+    stm.move(instr_list)
+    # print("entering loop")
+    # while True:
+      #  reply = img.take_image()
+      #  print("Img server reply: " + reply)
+      #  if reply != "0": 
+       #     stm.disconnect_STM() 
+        #    break
         
-        instr_list = [
-            'FW025',
-            'FL090',
-        ]
+        #instr_list = [
+         #   'FW025',
+          #  'FL090',
+        #]
         
-        for instr in instr_list:
-            img.write_to_STM(instr.encode())
-            while True:
-                    time.sleep(2)
-                    break
+       # for instr in instr_list:
+        #    stm.write_to_STM(instr.encode())
+         #   while True:
+          #          time.sleep(2)
+           #         break
