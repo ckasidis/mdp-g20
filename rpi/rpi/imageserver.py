@@ -14,7 +14,7 @@ import time
 st = time.time()
 
 # initialize the ImageHub object
-imageHub = imagezmq.ImageHub()
+imageHub = imagezmq.ImageHub(open_port='tcp://192.168.20.25:5555')
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
 
@@ -82,6 +82,7 @@ while True:
         confidence = info[0]['confidence']
         if confidence > 0.3: 
             #encoded_id = str(id).encode()
+            # name = "AND|"+name
             encoded_name = str(name).encode()
             print("[IMGREC] Object found, details are as follows:\nClass ID\t:{}\nConfidence\t:{}".format(name, confidence))
             imageHub.send_reply(encoded_name)
@@ -114,6 +115,3 @@ while True:
         # results.save()
 
     print("[IMGREC] Time taken for inference and set up is \t: {} seconds...".format((time.time()-st)))
-
-
-   

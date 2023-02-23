@@ -128,7 +128,7 @@ class MultiProcess:
 
                         # Message format for Image Rec: RPI|TOCAM
                         if messages[0] == 'RPI':
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
                             self.image_queue.put_nowait('take')
                         elif messages[0] == 'RPI_END':
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
@@ -251,23 +251,30 @@ class MultiProcess:
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
 
-                        #Reply received from the Image Processing Server
+                        # Reply received from the Image Processing Server
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
                         print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
 
                         # #Messages sent to ALG & AND')
                         if self.reply == 'n':
+                            # print("Message received from IMG REC PC is NULL")
                             self.reply = 'n'
                             self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
                             
                         else:
-#                             #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
+                            # msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
+                            # print("[IMG REC] Received message : ",str(self.reply),"\n")
                             self.reply += '\n'
-                            print(self.reply)
-                            self.message_queue.put_nowait(self._format_for('ALG',self.reply.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+                            # print(self.reply)
+
+                            # # DONT NEED TO SEND ALGO PC OUTPUT FOR THE FIRST TASK
+                            # self.message_queue.put_nowait(self._format_for('ALG',self.reply.encode()))
+                            # print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+
+                            self.message_queue.put_nowait(self._format_for('AND',self.reply.encode()))
+                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + self.reply)
 
                         self.camera.close()
                 

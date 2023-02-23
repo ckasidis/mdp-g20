@@ -54,6 +54,9 @@ def fixCommands(commands):
             cmds.append("RPI|TOCAM")
         else:
             cmds.append("STM|"+i)
+
+
+    cmds.append("RPI_END")
     return cmds
 
 def write_json(data, filename="testing.json"):
