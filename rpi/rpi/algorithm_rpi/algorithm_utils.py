@@ -4,9 +4,11 @@ import queue
 import json
 from itertools import groupby
 
-
 from colorama import *
+
 init(autoreset=True)
+
+
 # print(sys.version)
 # print(sys.path)
 
@@ -15,11 +17,16 @@ init(autoreset=True)
 def main(map_dir, cmd_dir):
     ''' Main driver/wrapper function to execute all all sub functions'''
     try:
-        filename1=map_dir
-        filename2=cmd_dir
+        filename1 = map_dir
+        filename2 = cmd_dir
         maze, ObstacleList, GOALLIST = ReadWriteConvert(filename1)
 
-        GOALLIST  = greedy_sort(GOALLIST)
+        GOALLIST = greedy_sort(GOALLIST)
+        Obstaclevisit = []
+        for i in range(len(GOALLIST)):
+            Obstaclevisit.append("AND|OBS-" + str(GOALLIST[i].pop()))
+            GOALLIST[i] = tuple(GOALLIST[i])
+        write_json(Obstaclevisit, filename="ObjectIDsequence.json")
         # print(ObstacleList)
         ### Convert the maze to a graph
         mazegraph = maze_to_graph(maze)
@@ -38,7 +45,8 @@ def main(map_dir, cmd_dir):
                 nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=BT, goal=GOALLIST[i + 1])
                 path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=BT, goal=GOALLIST[i + 1])
             else:
-                nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
+                nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i],
+                                                                            goal=GOALLIST[i + 1])
                 path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=GOALLIST[i + 1])
 
             lol.append(path)
@@ -55,39 +63,42 @@ def main(map_dir, cmd_dir):
     except Exception as e:
         print(Fore.RED + '[PATH MAIN FUNC ERROR]', str(e))
 
-def fixCommands(commands):
-    cmds=[]
-    for i in commands:
-        if i=='Camera':
-            cmds.append("RPI|TOCAM") # keyword for camera
-        else:
-            cmds.append("STM|"+i)
 
-    cmds.append("RPI_END|0") # add stop word
+def fixCommands(commands):
+    cmds = []
+    for i in commands:
+        if i == 'Camera':
+            cmds.append("RPI|TOCAM")  # keyword for camera
+        else:
+            cmds.append("STM|" + i)
+
+    cmds.append("RPI_END|0")  # add stop word
     # return cmds
 
-    grouped_L = [(k, sum(1 for i in g)) for k,g in groupby(cmds)]
+    grouped_L = [(k, sum(1 for i in g)) for k, g in groupby(cmds)]
     # print(grouped_L)
-    new_cmds=[]
+    new_cmds = []
     for i in grouped_L:
-        cmd = i[0].split("|",1)[1]
-        if cmd=="FW010":
-            newCmd = "STM|FW0"+str(i[1])+"0"
+        cmd = i[0].split("|", 1)[1]
+        if cmd == "FW010":
+            newCmd = "STM|FW0" + str(i[1]) + "0"
             new_cmds.append(newCmd)
-        elif cmd=="BW010":
-            newCmd = "STM|BW0"+str(i[1])+"0"
+        elif cmd == "BW010":
+            newCmd = "STM|BW0" + str(i[1]) + "0"
             new_cmds.append(newCmd)
         else:
             new_cmds.append(i[0])
     # print(new_cmds)
     return new_cmds
 
+
 def write_json(data, filename="testing.json"):
     cmds = fixCommands(data)
     with open(filename, "w") as f:
         json.dump(cmds, f, indent=4)
 
-def ReadWriteConvert(filename = "AcquireFromAndriod.json"):
+
+def ReadWriteConvert(filename="AcquireFromAndriod.json"):
     # file = "AcquireFromAndriod.json"
     maze = []
     for i in range(22):
@@ -101,11 +112,11 @@ def ReadWriteConvert(filename = "AcquireFromAndriod.json"):
                 continue
             inner.append(0)
         maze.append(inner)
-    obstacles=[]
+    obstacles = []
     with open(filename) as json_file:
         data = json.load(json_file)
         # obs = data.replace("ALGO|", "")
-        obs = data[1:len(obstacles)-1]
+        obs = data[1:len(obstacles) - 1]
         obs = obs.split(', ')
         # print(obs)
 
@@ -121,7 +132,7 @@ def ReadWriteConvert(filename = "AcquireFromAndriod.json"):
 
     # print(obstacles)
     GOALLIST = []
-    GOALLIST.append((2, 2, 'E'))
+    GOALLIST.append((2, 2, 'E', 0))
     ObstacleList = []
     # Convert the list of obstacles to fit the tree
     for i in range(len(obstacles)):
@@ -146,51 +157,53 @@ def ReadWriteConvert(filename = "AcquireFromAndriod.json"):
         Direction = obstacles[i][2]
         Xcoords = obstacles[i][0]
         Ycoords = obstacles[i][1]
+        obstacleid = obstacles[i][3]
         maze[Xcoords][Ycoords] = 1
         if (Direction == "N"):
             maze[Xcoords - 2][Ycoords] = 0.5
-            GOALLIST.append((Xcoords - 2, Ycoords, "S"))
+            GOALLIST.append([Xcoords - 2, Ycoords, "S", obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "N"))
 
         elif (Direction == "S"):
             maze[Xcoords + 2][Ycoords] = 0.5
-            GOALLIST.append((Xcoords + 2, Ycoords, "N"))
+            GOALLIST.append([Xcoords + 2, Ycoords, "N",obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "S"))
 
         elif (Direction == "E"):
             maze[Xcoords][Ycoords + 2] = 0.5
-            GOALLIST.append((Xcoords, Ycoords + 2, "W"))
+            GOALLIST.append([Xcoords, Ycoords + 2, "W", obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "E"))
 
         elif (Direction == "W"):
             maze[Xcoords][Ycoords - 2] = 0.5
-            GOALLIST.append((Xcoords, Ycoords - 2, "E"))
+            GOALLIST.append([Xcoords, Ycoords - 2, "E",obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "W"))
 
         else:
-            ObstacleList.append((Xcoords - 1, Ycoords - 1, "NIL"))
-
-    # print(ObstacleList)
-    # print("Goallist=", GOALLIST)
+            ObstacleList.append([Xcoords - 1, Ycoords - 1, "NIL"])
 
     maze = np.array(maze)
 
     return maze, ObstacleList, GOALLIST
 
+
 def greedy_sort(coordinates):
     path = []
     current_point = coordinates[0]
     while coordinates:
-        closest_point = min(coordinates, key=lambda x: ((x[0]-current_point[0])**2 + (x[1]-current_point[1])**2)**0.5)
+        closest_point = min(coordinates,
+                            key=lambda x: ((x[0] - current_point[0]) ** 2 + (x[1] - current_point[1]) ** 2) ** 0.5)
         path.append(closest_point)
         current_point = closest_point
         coordinates.remove(closest_point)
     return path
 
+
 def heuristic(nodeA, nodeB):
     (xA, yA, AD) = nodeA  # gets the coodinates of X and Y of current node
     (xB, yB, BD) = nodeB  # gets the coordinates of X and Y of Destination node
     return abs(xA - xB) + abs(yA - yB)
+
 
 # A*-Search (A*S) with Priority Queue
 def astar_search(mazeGraph, start, goal):
@@ -238,7 +251,8 @@ def astar_search(mazeGraph, start, goal):
 
         return explored, pathcost, processed
     except Exception as e:
-        print(Fore.RED + '[ASTAR SEARCH ERROR]',str(e))
+        print(Fore.RED + '[ASTAR SEARCH ERROR]', str(e))
+
 
 # Reconstruct the path from the Dict of explored nodes {node : parentNode}
 # Intuition : Backtrack from the goal node by checking successive parents
@@ -250,7 +264,7 @@ def reconstruct_path(explored, start, goal):
         direction = ['N', 'S', 'E', 'W']
         cantreachgoal = False
         # stop when backtrack reaches start node
-        actions += explored[currentNode][1] 
+        actions += explored[currentNode][1]
         while currentNode != start:
             # grow the path backwards and backtrack
             flag = 0
@@ -275,7 +289,7 @@ def reconstruct_path(explored, start, goal):
 
                 # Try Changing to left or right
             # currentNode = explored[currentNode]
-        
+
         path.append(start)  # append start node for completeness
         path.reverse()  # reverse the path from start to goal
 
@@ -285,8 +299,9 @@ def reconstruct_path(explored, start, goal):
         return path, cantreachgoal, actions
 
     except Exception as e:
-        print(Fore.RED + "[RECONSTRUCTPATH ERROR]",str(e))
+        print(Fore.RED + "[RECONSTRUCTPATH ERROR]", str(e))
         # raise e
+
 
 # Function to convert a maze to a graph
 def maze_to_graph(mazeGrid):
