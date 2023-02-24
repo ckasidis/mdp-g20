@@ -134,12 +134,24 @@ class MultiProcess:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
                             sys.exit()
-                        elif messages[0] == 'AND_PATH':
+                        # elif messages[0] == 'AND_PATH':
+                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                        #     self.to_AND_message_queue.put_nowait(messages[1].encode())
+                        # elif messages[0] == 'AND_IMAGE':
+                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                        #     self.to_AND_message_queue.put_nowait(messages[1].encode())
+                        # elif messages[0] == 'RPI_END':
+                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
+                        #     print("RPI ENDING NOW...")
+                        #     sys.exit()
+                        # elif messages[0] == 'AND_PATH':
+                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                        #     self.to_AND_message_queue.put_nowait(messages[1].encode())
+                        elif messages[0] == "STM":
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.to_AND_message_queue.put_nowait(messages[1].encode())
-                        elif messages[0] == 'AND_IMAGE':
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.to_AND_message_queue.put_nowait(messages[1].encode())
+                            # self.to_AND_message_queue.put_nowait(messages[1].encode())
+                            self.STM.move(messages[1])
+                            self.ALG.write_to_ALG(str('ALG|CMPLT').decode())
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
