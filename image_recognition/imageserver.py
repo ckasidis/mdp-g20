@@ -14,6 +14,16 @@ init(autoreset=True)
 
 st = time.time()
 
+def draw_bbox():
+     for box in results.xyxy[0]: 
+            if box[5]==0:
+                xB = int(box[2])
+                xA = int(box[0])
+                yB = int(box[3])
+                yA = int(box[1])
+                cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
+                cv2.imshow("OutputWindow",frame)
+
 print(Fore.LIGHTCYAN_EX+"[IMGREC] Setting up the Image Recognition system...")
 
 # initialize the ImageHub object
@@ -34,6 +44,10 @@ model_path = r'C:\Users\siddh\Desktop\mdp-g20\image_recognition\yolov5\content\y
 wts_path = r'C:\Users\siddh\Desktop\mdp-g20\image_recognition\best-model.pt'
 
 model = torch.hub.load(model_path, 'custom', path=wts_path, source='local')  # local repo
+model.conf = 0.25  # confidence threshold (0-1)
+model.iou = 0.45  # NMS IoU threshold (0-1)
+# model.classes = [0] # (optional list) filter by class, i.e. = [0, 15, 16] for persons, cats and dogs
+
 
 print(Fore.LIGHTGREEN_EX+"[IMGREC] YOLOv5 Model initialisation done...")
 
