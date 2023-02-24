@@ -105,6 +105,14 @@ class MultiProcess:
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for('ALG', (messages[1]).encode()))
                             print('queued')
+                        # Message format for Image Rec: RPI|TOCAM
+                        elif messages[0] == 'RPI':
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
+                            self.image_queue.put_nowait('take')
+                        elif messages[0] == 'RPI_END':
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
+                            print("RPI ENDING NOW...")
+                            sys.exit()
                         else:
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))

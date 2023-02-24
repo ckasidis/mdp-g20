@@ -59,11 +59,13 @@ def testAlgorithm():
     filename2 = 'commands2stm.json'
     try:
         commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
-        for i in commands:
-            if i=='Camera':
-                print("\nRPI|"+i)
-            else:
-                print("\nSTM|"+i)
+        # for i in commands:
+        #     if i=='Camera':
+        #         print("\nRPI|"+i)
+        #     else:
+        #         print("\nSTM|"+i)
+        commands=fixCommands(commands)
+        print(commands)
     # print(commands)
     except:
         print(Fore.RED + '[ALGO ERROR]')

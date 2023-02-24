@@ -2,6 +2,7 @@ from mazegraph import MazeGraph
 import numpy as np
 import queue
 import json
+from itertools import groupby
 
 
 from colorama import *
@@ -63,7 +64,23 @@ def fixCommands(commands):
             cmds.append("STM|"+i)
 
     cmds.append("RPI_END|0") # add stop word
-    return cmds
+    # return cmds
+
+    grouped_L = [(k, sum(1 for i in g)) for k,g in groupby(cmds)]
+    # print(grouped_L)
+    new_cmds=[]
+    for i in grouped_L:
+        cmd = i[0].split("|",1)[1]
+        if cmd=="FW010":
+            newCmd = "STM|FW0"+str(i[1])+"0"
+            new_cmds.append(newCmd)
+        elif cmd=="BW010":
+            newCmd = "STM|BW0"+str(i[1])+"0"
+            new_cmds.append(newCmd)
+        else:
+            new_cmds.append(i[0])
+    # print(new_cmds)
+    return new_cmds
 
 def write_json(data, filename="testing.json"):
     cmds = fixCommands(data)
