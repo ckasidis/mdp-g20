@@ -75,7 +75,7 @@ while True:
     #frame = imutils.resize(frame, width=640)
     resized = cv2.resize(frame,(640,640))
     (h, w) = resized.shape[:2]
-    cv2.imwrite('frame.png')
+    cv2.imwrite('frame.png', resized)
 
     #frame = imutils.resize(frame, width=400)
     #set confidence for model 
@@ -89,7 +89,7 @@ while True:
         #id = info[0]['class']
         name = info[0]['name']
         confidence = info[0]['confidence']
-        if confidence > 0.3: 
+        if confidence > 0.1: 
             #encoded_id = str(id).encode()
             # name = "AND|"+name
             encoded_name = str(name).encode()
