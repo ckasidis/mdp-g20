@@ -105,6 +105,12 @@ class MultiProcess:
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
                             print('queued')
+                        elif messages[0] == 'RPI_END':
+                            print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
+                            # assert isinstance(messages, object)
+                            # self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
+                            # print('queued')
+                            sys.exit()
                         else:
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
