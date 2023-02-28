@@ -281,7 +281,7 @@ class MultiProcess:
                         if self.reply == 'n':
                             # print("Message received from IMG REC PC is NULL")
                             self.reply = 'n'
-                            self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
+                            # self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
                             self.ALG.write_to_ALG(str('CMPLT').encode()) # comment for main day
 
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
@@ -297,7 +297,7 @@ class MultiProcess:
                             # print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
                             self.ALG.write_to_ALG(str('CMPLT').encode()) # comment for main day
 
-                            self.message_queue.put_nowait(self._format_for('AND',self.reply.encode()))
+                            # self.message_queue.put_nowait(self._format_for('AND',self.reply.encode()))
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + self.reply)
 
                         self.camera.close()
