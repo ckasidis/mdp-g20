@@ -86,11 +86,10 @@ class STM:
         self.write_to_STM(instr.encode())
         while True:
             print("move() while loop")
-            #bytesToRead = self.STM_connection.inWaiting()
+            bytesToRead = self.STM_connection.inWaiting()
             raw_dat = self.STM_connection.read(1)
             print("raw_dat: " + str(raw_dat))
             dat = raw_dat.strip().decode()
-            print("dat: " + dat)
             # test_dat = raw_dat.decode().strip()
             # test_decode = raw_dat.decode()
             # print("test_dat: " + test_dat)
