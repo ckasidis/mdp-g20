@@ -22,9 +22,11 @@ def main(map_dir, cmd_dir):
         maze, ObstacleList, GOALLIST = ReadWriteConvert(filename1)
 
         GOALLIST = greedy_sort(GOALLIST)
+        print("Printing the goal list:\n", GOALLIST)
         Obstaclevisit = []
         for i in range(len(GOALLIST)):
             Obstaclevisit.append("AND|OBS-" + str(GOALLIST[i].pop()))
+        for i in range(len(GOALLIST)):    
             GOALLIST[i] = tuple(GOALLIST[i])
         write_json(Obstaclevisit, filename="ObjectIDsequence.json")
 
@@ -59,7 +61,8 @@ def main(map_dir, cmd_dir):
                     tempSideGoal[1] = tempSideGoal[1] + 1
                     temp.append(tuple(tempSideGoal))
                     maze[tempSideGoal[0], tempSideGoal[1]] = 0.5
-
+            GOALLIST[i] = temp
+            
         mazegraph = maze_to_graph(maze)
 
         # Print the edges with weights
@@ -96,6 +99,8 @@ def fixCommands(commands):
     for i in commands:
         if i == 'Camera':
             cmds.append("RPI|TOCAM")  # keyword for camera
+        elif 'AND|' in i:
+            cmds.append(i)
         else:
             cmds.append("STM|" + i)
 
@@ -159,7 +164,7 @@ def ReadWriteConvert(filename="AcquireFromAndriod.json"):
 
     # print(obstacles)
     GOALLIST = []
-    GOALLIST.append((2, 2, 'E', 0))
+    GOALLIST.append([2, 2, 'E', 0])
     ObstacleList = []
     # Convert the list of obstacles to fit the tree
     for i in range(len(obstacles)):

@@ -159,7 +159,7 @@ class MultiProcess:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             # self.to_AND_message_queue.put_nowait(messages[1].encode())
                             self.STM.move(messages[1])
-                            self.ALG.write_to_ALG(str('CMPLT').decode())
+                            self.ALG.write_to_ALG(str('CMPLT').encode())
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
