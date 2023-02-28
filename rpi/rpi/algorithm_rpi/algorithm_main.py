@@ -7,7 +7,7 @@ from algorithm_utils import main, fixCommands
 from re import M
 import socket
 import json
-
+import algotest
 
 from colorama import *
 init(autoreset=True)
@@ -101,30 +101,30 @@ def runAlgorithm():
 
             print("\n===============================Calculate path===============================\n")
             print(Fore.LIGHTCYAN_EX + "Running the algorithm....")
-            commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
+            commands = RunMain(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
             print(Fore.LIGHTGREEN_EX + "The algorithm has completed computation, generating STM commands...")
             commands = fixCommands(commands)
             print("\nFull list of STM commands till last obstacle:")
             print(f'{commands}') # View the commands/actions generated
-
+            all_cmd_str = ','.join(str(e) for e in commands)
             print("\n\n=======================Send path commands to move to obstacles=======================\n")
-            
-            count=0
-            for command in commands: # IF SENDING ONE BY ONE
-                count+=1
-                print(f"\nSending path commands to execute the command #{count} to RPI to STM...")
-                client.send(command)
+            client.send(all_cmd_str)
+            # count=0
+            # for command in commands: # IF SENDING ONE BY ONE
+            #     count+=1
+            #     print(f"\nSending path commands to execute the command #{count} to RPI to STM...")
+            #     client.send(command)
 
-                print("Waiting to receive aknowledgement")
-                var = client.receive()
-                print(f"Message received (via RPi): {var}")
-                # time.sleep(2)
-                # continue
-                if var==stopword_from_STM:
-                    print(Fore.LIGHTGREEN_EX + f"Acknowledgement received successfully, sending next command {command}...")
-                    continue
-                else:
-                    print(Fore.RED + "Received a strange message from RPi, please cross-check.")
+            #     print("Waiting to receive aknowledgement")
+            #     var = client.receive()
+            #     print(f"Message received (via RPi): {var}")
+            #     # time.sleep(2)
+            #     # continue
+            #     if var==stopword_from_STM:
+            #         print(Fore.LIGHTGREEN_EX + f"Acknowledgement received successfully, sending next command {command}...")
+            #         continue
+            #     else:
+            #         print(Fore.RED + "Received a strange message from RPi, please cross-check.")
             
             client.close()
             break
