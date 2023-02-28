@@ -302,6 +302,7 @@ class MultiProcess:
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + self.reply)
 
                         self.camera.close()
+                        break;
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
