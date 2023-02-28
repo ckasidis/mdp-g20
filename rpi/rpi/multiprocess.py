@@ -125,10 +125,10 @@ class MultiProcess:
         while True:
             try:
                 message = self.ALG.read_from_ALG()
-                print(message)
+                print("msg before split ",message)
                 if message is None:
                     continue
-                message_list = message.splitlines()
+                message_list = message.split(",")
                 print("msglist: ", message_list)
                 for msg in message_list:
                     if len(msg) != 0:
