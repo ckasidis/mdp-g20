@@ -282,6 +282,8 @@ class MultiProcess:
                             # print("Message received from IMG REC PC is NULL")
                             self.reply = 'n'
                             self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
+                            self.ALG.write_to_ALG(str('CMPLT').encode()) # comment for main day
+
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
                             
                         else:
@@ -293,6 +295,7 @@ class MultiProcess:
                             # # DONT NEED TO SEND ALGO PC OUTPUT FOR THE FIRST TASK
                             # self.message_queue.put_nowait(self._format_for('ALG',self.reply.encode()))
                             # print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+                            self.ALG.write_to_ALG(str('CMPLT').encode()) # comment for main day
 
                             self.message_queue.put_nowait(self._format_for('AND',self.reply.encode()))
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + self.reply)
