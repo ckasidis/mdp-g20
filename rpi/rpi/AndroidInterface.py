@@ -22,6 +22,7 @@ class Android:
 #        self.server.close()
         self.server.bind(("",PORT_ANY))
         self.server.listen(PORT_ANY)
+        print('[TEST] sockname: ' + str(self.server.getsockname()))
         self.port = self.server.getsockname()[1]
 
         advertise_service(
