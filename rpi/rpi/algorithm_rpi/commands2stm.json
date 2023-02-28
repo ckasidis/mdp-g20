@@ -1,17 +1,8 @@
 [
-    "STM|FW050",
-    "STM|BR090",
-    "STM|BW010",
+    "STM|FW030",
     "STM|FR090",
-    "RPI|TOCAM",
-    "STM|BW020",
-    "STM|FR090",
-    "STM|BW020",
+    "STM|FW030",
     "STM|FL090",
-    "STM|FW060",
-    "STM|FR090",
-    "STM|BW020",
-    "STM|FR090",
     "RPI|TOCAM",
     "RPI_END|0"
 ]

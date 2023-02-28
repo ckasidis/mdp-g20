@@ -69,7 +69,7 @@ class MultiProcess:
             self.write_process.start()
             
             startComms_dt = datetime.now().strftime('%d-%b-%Y %H:%M%S')
-            print(Fore.LIGHTGREEN_EX + str(startComms_dt) + '| [MultiProcess] Communications started. Reading from STM, Algorithm & Android')
+            print(Fore.GREEN + str(startComms_dt) + '| [MultiProcess] Communications started. Reading from STM, Algorithm & Android')
             time.sleep(1)
             self.image_process.start()
             for process in self.processes:
@@ -101,16 +101,16 @@ class MultiProcess:
                         messages = msg.split('|', 1)
 
                         if messages[0] == 'ALGO':
-                            print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
+                            print(Fore.BLUE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for('ALG', (messages[1]).encode()))
                             print('queued')
                         # Message format for Image Rec: RPI|TOCAM
                         elif messages[0] == 'RPI':
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
+                            print(Fore.BLUE + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
                             self.image_queue.put_nowait('take')
                         elif messages[0] == 'RPI_END':
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
+                            print(Fore.BLUE + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
                             sys.exit()
                         else:
@@ -159,7 +159,7 @@ class MultiProcess:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             # self.to_AND_message_queue.put_nowait(messages[1].encode())
                             self.STM.move(messages[1])
-                            self.ALG.write_to_ALG(str('ALG|CMPLT').decode())
+                            self.ALG.write_to_ALG(str('CMPLT').decode())
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
@@ -167,6 +167,7 @@ class MultiProcess:
                             self.to_AND_message_queue.put_nowait(messages[1].encode())
 
             except Exception as e:
+        
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 

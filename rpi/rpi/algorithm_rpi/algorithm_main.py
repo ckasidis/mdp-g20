@@ -117,17 +117,20 @@ def runAlgorithm():
 
                 print("Waiting to receive aknowledgement")
                 var = client.receive()
-                # print(f"Message received (via RPi): {var}")
-
-                if var == stopword_from_STM:
+                print(f"Message received (via RPi): {var}")
+                # time.sleep(2)
+                # continue
+                if var==stopword_from_STM:
                     print(Fore.LIGHTGREEN_EX + f"Acknowledgement received successfully, sending next command {command}...")
                     continue
                 else:
                     print(Fore.RED + "Received a strange message from RPi, please cross-check.")
             
-            # client.close()
-            # break
+            client.close()
+            break
             
+            # client.send(commands)
+
             '''
             # IF SENDING THE ENTIRE ARRAY AT ONCE
             arr_str = ','.join(str(x) for x in arr) # Converting the array to a string
