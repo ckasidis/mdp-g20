@@ -129,6 +129,7 @@ class MultiProcess:
                 if message is None:
                     continue
                 message_list = message.splitlines()
+                print("msglist: " + message_list)
                 for msg in message_list:
                     if len(msg) != 0:
 

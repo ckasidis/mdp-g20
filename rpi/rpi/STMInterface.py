@@ -88,6 +88,7 @@ class STM:
             dat = raw_dat.strip().decode()
             # print(raw_dat)
             if dat == 'R':
+                print("received R reply from STM")
                 break
                 # reply = str(dat.decode())
                 # return reply
