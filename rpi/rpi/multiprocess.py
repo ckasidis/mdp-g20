@@ -124,6 +124,7 @@ class MultiProcess:
     def _read_ALG(self):
         while True:
             try:
+                print("read msg from algo")
                 message = self.ALG.read_from_ALG()
                 print("msg before split ",message)
                 if message is None:
