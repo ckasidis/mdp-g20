@@ -27,8 +27,39 @@ def main(map_dir, cmd_dir):
             Obstaclevisit.append("AND|OBS-" + str(GOALLIST[i].pop()))
             GOALLIST[i] = tuple(GOALLIST[i])
         write_json(Obstaclevisit, filename="ObjectIDsequence.json")
-        # print(ObstacleList)
-        ### Convert the maze to a graph
+
+        for i in range(1, len(GOALLIST)):
+            temp = []
+            current = GOALLIST[i]
+
+            temp.append(current)
+            if current[2] == "E" or current[2] == "W":
+                if (current[0] > 2):
+                    tempSideGoal = list(current)
+                    tempSideGoal[0] = tempSideGoal[0] - 1
+                    temp.append(tuple(tempSideGoal))
+                    maze[tempSideGoal[0], tempSideGoal[1]] = 0.5
+
+                if (current[0] < 19):
+                    tempSideGoal = list(current)
+                    tempSideGoal[0] = tempSideGoal[0] + 1
+                    temp.append(tuple(tempSideGoal))
+                    maze[tempSideGoal[0], tempSideGoal[1]] = 0.5
+
+
+            elif current[2] == "N" or current[2] == "S":
+                if (current[1] > 2):
+                    tempSideGoal = list(current)
+                    tempSideGoal[1] = tempSideGoal[1] - 1
+                    temp.append(tuple(tempSideGoal))
+                    maze[tempSideGoal[0], tempSideGoal[1]] = 0.5
+
+                if (current[1] < 19):
+                    tempSideGoal = list(GOALLIST[i])
+                    tempSideGoal[1] = tempSideGoal[1] + 1
+                    temp.append(tuple(tempSideGoal))
+                    maze[tempSideGoal[0], tempSideGoal[1]] = 0.5
+
         mazegraph = maze_to_graph(maze)
 
         # Print the edges with weights
@@ -40,14 +71,10 @@ def main(map_dir, cmd_dir):
         lol = []
         FinalActions = []
         for i in range(len(GOALLIST) - 1):
-            if cantreachgoal == True:
-                BT = lol[i - 1][-2]
-                nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=BT, goal=GOALLIST[i + 1])
-                path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=BT, goal=GOALLIST[i + 1])
-            else:
-                nodesExplored, pathsExplored, nodesProcessed = astar_search(mazegraph, start=GOALLIST[i],
-                                                                            goal=GOALLIST[i + 1])
-                path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=GOALLIST[i + 1])
+            nodesExplored, pathsExplored, nodesProcessed, currentNode = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
+            GOALLIST[i + 1] = currentNode
+            # print(nodesExplored[(2, 6, 'E')])
+            path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=currentNode)
 
             lol.append(path)
             FinalActions += actions
@@ -212,6 +239,10 @@ def astar_search(mazeGraph, start, goal):
         Output : Dict of explored vertices in the graph
     '''
     try:
+        ''' Function to perform A*S to find path in a graph
+                Input  : Graph with the start and goal vertices
+                Output : Dict of explored vertices in the graph
+            '''
         frontier = queue.PriorityQueue()  # Priority Queue for Frontier
 
         # initialization
@@ -227,8 +258,9 @@ def astar_search(mazeGraph, start, goal):
             processed += 1
 
             # stop when goal is reached
-            if currentNode == goal:
-                break
+            if currentNode in goal:
+                if (processed != 1):
+                    break
 
             # explore every single neighbor of current node
             for nextNode, weight, action in mazeGraph.neighbors(currentNode):
@@ -239,7 +271,7 @@ def astar_search(mazeGraph, start, goal):
                 if (nextNode not in explored) or (
                         newcost < pathcost[nextNode]):  # if the newcost is smaller then the nextNode
                     # priority= #f(n) = h(n) + g(n);
-                    priority = heuristic(nextNode, goal) + newcost
+                    priority = heuristic(nextNode, goal[0]) + newcost
                     # put new node in frontier with priority
                     frontier.put((priority, nextNode))
 
@@ -249,7 +281,7 @@ def astar_search(mazeGraph, start, goal):
                     # updates g(n) for the nextNode
                     pathcost[nextNode] = newcost
 
-        return explored, pathcost, processed
+        return explored, pathcost, processed, currentNode
     except Exception as e:
         print(Fore.RED + '[ASTAR SEARCH ERROR]', str(e))
 
@@ -261,41 +293,29 @@ def reconstruct_path(explored, start, goal):
         currentNode = goal  # start at the goal node
         path = []  # initiate the blank path
         actions = []
-        direction = ['N', 'S', 'E', 'W']
         cantreachgoal = False
         # stop when backtrack reaches start node
-        actions += explored[currentNode][1]
+        try:
+            actions += explored[currentNode][1]
+        except TypeError:
+            return
         while currentNode != start:
             # grow the path backwards and backtrack
             flag = 0
             path.append(currentNode)
+            currentNode = explored[currentNode][0]
             try:
-                currentNode = explored[currentNode][0]
-            except KeyError:
-                num = direction.index(currentNode[2])
-                if num == 3:
-                    num = -1
-                currentNode = (currentNode[0], currentNode[1], direction[num + 1])
-                cantreachgoal = True
-                flag = 0
-
-            if (flag == 0):
-                try:
-                    actions += explored[currentNode][1]
-                except TypeError:
-                    continue
-            else:
+                actions += explored[currentNode][1]
+            except TypeError:
                 continue
 
                 # Try Changing to left or right
             # currentNode = explored[currentNode]
-
         path.append(start)  # append start node for completeness
         path.reverse()  # reverse the path from start to goal
 
         actions.append
         actions.reverse()
-
         return path, cantreachgoal, actions
 
     except Exception as e:
