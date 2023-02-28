@@ -99,6 +99,8 @@ class STM:
                 # return reply
                 # break
 
+        print("exiting move while loop")
+
 
 if __name__ == '__main__':
     ser = STM()
