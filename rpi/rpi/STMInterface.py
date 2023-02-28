@@ -86,7 +86,12 @@ class STM:
         while True:
             raw_dat = self.STM_connection.read(1)
             dat = raw_dat.strip().decode()
-            # print(raw_dat)
+            test_dat = raw_dat.decode().strip()
+            test_decode = raw_dat.decode()
+            print("dat: " + dat)
+            print("raw_dat: " + raw_dat)
+            print("test_dat: " + test_dat)
+            print("test_decode: " + test_decode)
             if dat == 'R':
                 print("received R reply from STM")
                 break
