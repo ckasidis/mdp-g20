@@ -276,7 +276,7 @@ class MultiProcess:
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
                         print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
-
+                        self.ALG.write_to_ALG(str('CMPLT').encode())
                         # #Messages sent to ALG & AND')
                         if self.reply == 'n':
                             # print("Message received from IMG REC PC is NULL")
