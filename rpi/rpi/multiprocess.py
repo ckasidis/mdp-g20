@@ -241,10 +241,11 @@ class MultiProcess:
                         self.rpi_name = socket.gethostname()
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                         self.rawCapture = PiRGBArray(self.camera)
-
+                        print("takepic(): ",self.rpi_name )
                         self.camera.capture(self.rawCapture, format="bgr")
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
+                        print('self.image: ' ,self.image)
 
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
