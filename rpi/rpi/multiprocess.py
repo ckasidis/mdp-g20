@@ -44,7 +44,7 @@ class MultiProcess:
         self.sender = None
 
         self.image_queue = self.manager.Queue()
-        self.image_process = Process(target = self._take_pic)
+        #self.image_process = Process(target = self._take_pic)
         
         
         self.processes = []
@@ -237,7 +237,7 @@ class MultiProcess:
             while True:
                 try:
                     #if not self.image_queue.empty():
-                        #test = self.image_queue.get_nowait()
+                        #q = self.image_queue.get_nowait()
                         self.rpi_name = socket.gethostname()
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                         self.rawCapture = PiRGBArray(self.camera)
