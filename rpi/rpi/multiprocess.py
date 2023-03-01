@@ -43,8 +43,8 @@ class MultiProcess:
 
         self.sender = None
 
-        self.image_queue = self.manager.Queue()
-        self.image_process = Process(target = self._take_pic)
+        #self.image_queue = self.manager.Queue()
+        #self.image_process = Process(target = self._take_pic)
         
         
         self.processes = []
