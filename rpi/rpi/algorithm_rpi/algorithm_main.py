@@ -126,17 +126,11 @@ def runAlgorithm():
             #     else:
             #         print(Fore.RED + "Received a strange message from RPi, please cross-check.")
             
-            client.close()
-            break
+            # client.close()
+            # break
             
             # client.send(commands)
 
-            '''
-            # IF SENDING THE ENTIRE ARRAY AT ONCE
-            arr_str = ','.join(str(x) for x in arr) # Converting the array to a string
-            client.sendall(arr_str.encode()) # Sending the data
-            print("Sent the commands (as an array) to RPi")
-            '''
 
         except KeyboardInterrupt:
             client.close()

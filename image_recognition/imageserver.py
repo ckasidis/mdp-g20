@@ -50,7 +50,7 @@ def load_model():
 
     # model.conf = 0.25  # confidence threshold (0-1)
     # model.iou = 0.45  # NMS IoU threshold (0-1)
-    model.classes = [0] # (optional list) filter by class, i.e. = [0, 15, 16] for persons, cats and dogs
+    # model.classes = [0] # (optional list) filter by class, i.e. = [0, 15, 16] for persons, cats and dogs
 
 
     print(Fore.GREEN +"[IMGREC] YOLOv5 Model initialisation done...")
