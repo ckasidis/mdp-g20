@@ -88,9 +88,6 @@ class STM:
             print('[STM-WRITE Error] %s' % str(e))
             raise e
 
-        print("exiting move while loop")
-
-
 if __name__ == '__main__':
     ser = STM()
 #    ser.__init__()
