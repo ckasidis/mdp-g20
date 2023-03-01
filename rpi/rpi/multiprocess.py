@@ -43,8 +43,8 @@ class MultiProcess:
 
         self.sender = None
 
-        #self.image_queue = self.manager.Queue()
-        #self.image_process = Process(target = self._take_pic)
+        self.image_queue = self.manager.Queue()
+        self.image_process = Process(target = self._take_pic)
         
         
         self.processes = []
@@ -202,24 +202,24 @@ class MultiProcess:
         while True:
             target = None
             try:
-                if not self.message_queue.empty():
-                    message = self.message_queue.get_nowait()
-                    print("msg :"+str(message))    
-                    target, payload = message['target'], message['payload']
-                    print(payload)
-                    if target == 'ALG':
-                        self.ALG.write_to_ALG(payload)
-                        print('Sending to algo via _write_target()')
-                        time.sleep(0.5)
-                    elif target == 'STM':
-                        print(Fore.LIGHTCYAN_EX + 'To STM: before write_to_STM method')
-                        self.STM.write_to_STM(payload)
-                        print(Fore.LIGHTCYAN_EX + 'To STM: after write_to_STM method')
-                    elif target == 'AND_PATH' or target == 'AND':
-                        time.sleep(1)
-                        self.AND.write_to_AND(payload)
-                    else:
-                        continue
+                #if not self.message_queue.empty():
+                    #message = self.message_queue.get_nowait()
+                print("msg :"+str(message))    
+                target, payload = message['target'], message['payload']
+                print(payload)
+                if target == 'ALG':
+                    self.ALG.write_to_ALG(payload)
+                    print('Sending to algo via _write_target()')
+                    time.sleep(0.5)
+                elif target == 'STM':
+                    print(Fore.LIGHTCYAN_EX + 'To STM: before write_to_STM method')
+                    self.STM.write_to_STM(payload)
+                    print(Fore.LIGHTCYAN_EX + 'To STM: after write_to_STM method')
+                elif target == 'AND_PATH' or target == 'AND':
+                    time.sleep(1)
+                    self.AND.write_to_AND(payload)
+                else:
+                    continue
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-WRITE-%s ERROR] %s' % (str(target), str(e)))
