@@ -263,7 +263,7 @@ class MultiProcess:
                             print("msg_to_send_AND: " , msg_to_send_AND)
                             self.message_queue.put_nowait(self._format_for('AND', msg_to_send_AND.encode()))
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
-                        self.camera.stop_preview()
+
                         self.camera.close()
                         break
                 
