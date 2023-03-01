@@ -137,15 +137,15 @@ class MultiProcess:
                         if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
                             #self.image_queue.put_nowait('take')
-                            while True:
-                                print("taking images")
-                                img_id_check_1 = self._take_pic()
-                                print("image 1 taken: ",img_id_check_1)
-                                img_id_check_2 = self._take_pic()
-                                print("image 2 taken: ",img_id_check_2)
-                                if img_id_check_1 == img_id_check_2:
-                                    print("images match")
-                                    break;
+                            # while True:
+                            #     print("taking images")
+                            #     img_id_check_1 = self._take_pic()
+                            #     print("image 1 taken: ",img_id_check_1)
+                            #     img_id_check_2 = self._take_pic()
+                            #     print("image 2 taken: ",img_id_check_2)
+                            #     if img_id_check_1 == img_id_check_2:
+                            #         print("images match")
+                            #         break
                         
                         
 
