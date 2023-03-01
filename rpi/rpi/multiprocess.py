@@ -150,7 +150,7 @@ class MultiProcess:
                         
 
                         elif messages[0] == 'RPI_END': # quit
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' )% (str(messages[0])))
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' )% (str(messages[0]))
                             print("RPI ENDING NOW...")
                             sys.exit()
                         elif messages[0] == 'STM': # stm
