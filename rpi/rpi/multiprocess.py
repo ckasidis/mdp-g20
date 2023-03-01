@@ -265,6 +265,7 @@ class MultiProcess:
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
                         self.camera.stop_preview()
                         self.camera.close()
+                        time.sleep(2)
                         break
                 
                 except Exception as e:
