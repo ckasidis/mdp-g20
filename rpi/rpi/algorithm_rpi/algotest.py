@@ -4,7 +4,6 @@ from itertools import groupby
 import ast
 import json
 
-
 def ReadWriteConvert():
     file = r"C:\Users\siddh\Desktop\mdp-g20\rpi\rpi\algorithm_rpi\AcquirefromAndroid.json"
     maze = []
@@ -87,7 +86,6 @@ def ReadWriteConvert():
     maze = np.array(maze)
 
     return maze, ObstacleList, GOALLIST
-
 
 
 def greedy_sort(coordinates):
@@ -542,7 +540,6 @@ def heuristic(nodeA, nodeB):
 
 
 # A*-Search (A*S) with Priority Queue
-
 def astar_search(mazeGraph, start, goal):
     ''' Function to perform A*S to find path in a graph
         Input  : Graph with the start and goal vertices
@@ -588,7 +585,6 @@ def astar_search(mazeGraph, start, goal):
 
     return explored, pathcost, processed, currentNode
 
-
 # Reconstruct the path from the Dict of explored nodes {node : parentNode}
 # Intuition : Backtrack from the goal node by checking successive parents
 def reconstruct_path(explored, start, goal):
@@ -620,11 +616,9 @@ def reconstruct_path(explored, start, goal):
     actions.reverse()
     return path, cantreachgoal, actions
 
-
 def write_json(data, filename):
     with open(filename, "w") as f:
         json.dump(data, f, indent=4)
-
 
 def finalmain():
     maze, ObstacleList, GOALLIST = ReadWriteConvert()
@@ -674,7 +668,8 @@ def finalmain():
         GOALLIST[i] = temp
 
     print(GOALLIST)
-        ### Convert the maze to a graph
+    
+    ### Convert the maze to a graph
     mazegraph = maze_to_graph(maze)
 
     # Print the edges with weights
@@ -686,30 +681,25 @@ def finalmain():
     lol = []
     FinalActions = []
     for i in range(len(GOALLIST) - 1):
-        nodesExplored, pathsExplored, nodesProcessed, currentNode = astar_search(mazegraph, start=GOALLIST[i],
-                                                                                 goal=GOALLIST[i + 1])
+        nodesExplored, pathsExplored, nodesProcessed, currentNode = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
         GOALLIST[i + 1] = currentNode
-        # print(nodesExplored[(2, 6, 'E')])
         path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=currentNode)
         lol.append(path)
         FinalActions += actions
-        #     print(lol)
-        #print("path", i, "=", path)
         ActionsWCamera += actions
         ActionsWCamera.append('Camera')
 
     print("Actions sent with Camera", ActionsWCamera)
     data = ActionsWCamera
     write_json(data, filename = "testing234.json")
-    return data
-
+    return data, Obstaclevisit
 
 def fix_Commands(commands):
     print("Commands before fixing:\n",commands)
     cmds = []
     for i in commands:
         if i == 'Camera':
-            cmds.append("RPI|TOCAM")  # keyword for camera
+            cmds.append("RPI|TOCAM")  
         elif 'AND|' in i:
             cmds.append(i)
         else:
@@ -748,12 +738,9 @@ def fix_Commands(commands):
     return new_cmds
     print("commands after fix 2:\n", new_cmds)
 
-
 def RunMain():
     data1 = finalmain()
     data = fix_Commands(data1)
-# data = fix_Commands(data)
     print("\n\n\n\n",data)
-    # print("\n\n\n\n",data1)
     return data
 
