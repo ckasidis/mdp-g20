@@ -150,7 +150,7 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str('AND'), str(messages[1])))
                             self.to_AND_message_queue.put_nowait(messages[1].encode())
-
+                print("finish message_list items")
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
