@@ -43,8 +43,8 @@ class MultiProcess:
 
         self.sender = None
 
-        self.image_queue = self.manager.Queue()
-        self.image_process = Process(target = self._take_pic)
+        #self.image_queue = self.manager.Queue()
+        #self.image_process = Process(target = self._take_pic)
         
         
         self.processes = []
@@ -136,7 +136,7 @@ class MultiProcess:
                         messages = msg.split('|', 1)
                         if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
-                            self.image_queue.put_nowait('take')
+                            #self.image_queue.put_nowait('take')
                             # while True:
                             #     print("taking images")
                             #     img_id_check_1 = self._take_pic()
@@ -248,38 +248,38 @@ class MultiProcess:
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
             while True:
                 try:
-                    if not self.image_queue.empty():
-                        test = self.image_queue.get_nowait()
-                        self.rpi_name = socket.gethostname()
-                        self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
-                        self.rawCapture = PiRGBArray(self.camera)
-                        print("takepic(): ",self.rpi_name )
-                        self.camera.capture(self.rawCapture, format="bgr")
-                        self.image = self.rawCapture.array
-                        self.rawCapture.truncate(0)
-                        print('self.image: ' ,self.image)
+                    #if not self.image_queue.empty():
+                        #test = self.image_queue.get_nowait()
+                    self.rpi_name = socket.gethostname()
+                    self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
+                    self.rawCapture = PiRGBArray(self.camera)
+                    print("takepic(): ",self.rpi_name )
+                    self.camera.capture(self.rawCapture, format="bgr")
+                    self.image = self.rawCapture.array
+                    self.rawCapture.truncate(0)
+                    print('self.image: ' ,self.image)
 
-                        self.reply = self.sender.send_image(self.rpi_name, self.image)
-                        self.reply = str(self.reply.decode())
-                        print('Reply message: ' + self.reply)
+                    self.reply = self.sender.send_image(self.rpi_name, self.image)
+                    self.reply = str(self.reply.decode())
+                    print('Reply message: ' + self.reply)
 
-                        if self.reply == 'n': # no object found
-                            self.reply = 'n'
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to Rpi: ' + self.reply)
-                            
-                        else: # object found
-                            cls_id = self.reply
-                            if len(self.obslst)>0:
-                                msg_to_send_AND = 'AND|OBS-'+str(self.obslst[0])+'-'+str(cls_id)
-                                self.obslst.pop(0)
-                            print("msg_to_send_AND: " , msg_to_send_AND)
-                            self.message_queue.put_nowait(self._format_for('AND', msg_to_send_AND.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
-                        self.camera.stop_preview()
-                        self.camera.close()
-                        time.sleep(2)
-                        #return str(self.reply)
-                        break
+                    if self.reply == 'n': # no object found
+                        self.reply = 'n'
+                        print(Fore.LIGHTYELLOW_EX + 'Message send across to Rpi: ' + self.reply)
+                        
+                    else: # object found
+                        cls_id = self.reply
+                        if len(self.obslst)>0:
+                            msg_to_send_AND = 'AND|OBS-'+str(self.obslst[0])+'-'+str(cls_id)
+                            self.obslst.pop(0)
+                        print("msg_to_send_AND: " , msg_to_send_AND)
+                        self.message_queue.put_nowait(self._format_for('AND', msg_to_send_AND.encode()))
+                        print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
+                    self.camera.stop_preview()
+                    self.camera.close()
+                    #time.sleep(2)
+                    return str(self.reply)
+                    #break
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
