@@ -25,7 +25,7 @@ class Client:
         self.socket = socket.socket()
     
     def connect(self):
-        print("=================================Connection=================================")
+        print("Connection")
         print(f"Attempting connection to ALGO at {self.host}:{self.port}")
         self.socket.connect((self.host, self.port))
         print(Fore.LIGHTGREEN_EX + "Connected to ALGO!")
@@ -52,29 +52,10 @@ class Client:
         print(Fore.LIGHTCYAN_EX + "Closing client socket.")
         self.socket.close()
 
-def testAlgorithm():
-
-    ''' Obselete function'''
-    filename1 = 'AcquirefromAndroid.json'
-    filename2 = 'commands2stm.json'
-    try:
-        commands = main(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
-        # for i in commands:
-        #     if i=='Camera':
-        #         print("\nRPI|"+i)
-        #     else:
-        #         print("\nSTM|"+i)
-        commands=fixCommands(commands)
-        print(commands)
-    # print(commands)
-    except:
-        print(Fore.RED + '[ALGO ERROR]')
-    
 
 def runAlgorithm():
     try:
-        # Create a client to send and receive information from the RPi
-        client = Client("192.168.20.1", 3004)  # 10.27.146 139 | 192.168.13.1
+        client = Client("192.168.20.1", 3004) 
         client.connect()
         print(Fore.LIGHTGREEN_EX + "Algorithm PC successfully connected to Raspberry Pi...")
 
@@ -87,7 +68,7 @@ def runAlgorithm():
 
     while True:
         try:
-            print("\n===========================Receive Obstacles Data===========================\n")
+            print("\nReceive Obstacles Data\n")
             print("Waiting to receive obstacle data from ANDROID...")
             
             obstacle_data = client.receive() # Receive the obstacle data
@@ -99,38 +80,21 @@ def runAlgorithm():
             with open(filename1, "w") as f: # Store the data in a json file
                 json.dump(data2, f, indent=4)
 
-            print("\n===============================Calculate path===============================\n")
-            print(Fore.LIGHTCYAN_EX + "Running the algorithm....")
-            commands = RunMain(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
-            print(Fore.LIGHTGREEN_EX + "The algorithm has completed computation, generating STM commands...")
-            commands = fixCommands(commands)
+            commands, obsOrder = RunMain(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
+            # commands = fixCommands(commands)
             print("\nFull list of STM commands till last obstacle:")
             print(f'{commands}') # View the commands/actions generated
+            print(f'The order of visiting obstacles is:\n',obsOrder)
             all_cmd_str = ','.join(str(e) for e in commands)
-            print("\n\n=======================Send path commands to move to obstacles=======================\n")
-            client.send(all_cmd_str)
-            # count=0
-            # for command in commands: # IF SENDING ONE BY ONE
-            #     count+=1
-            #     print(f"\nSending path commands to execute the command #{count} to RPI to STM...")
-            #     client.send(command)
-
-            #     print("Waiting to receive aknowledgement")
-            #     var = client.receive()
-            #     print(f"Message received (via RPi): {var}")
-            #     # time.sleep(2)
-            #     # continue
-            #     if var==stopword_from_STM:
-            #         print(Fore.LIGHTGREEN_EX + f"Acknowledgement received successfully, sending next command {command}...")
-            #         continue
-            #     else:
-            #         print(Fore.RED + "Received a strange message from RPi, please cross-check.")
-            
-            # client.close()
+            all_obs_str = ','.join(str(e) for e in obsOrder)
+            all_str = all_cmd + "$" + all_obs_str
+            client.send(all_str)
+            # print("Sent path commands to RPi\n")
+            # client.send(all_obs_str)
+            # print("Sent obstacles order to RPi")
+            client.close()
             # break
             
-            # client.send(commands)
-
 
         except KeyboardInterrupt:
             client.close()
@@ -141,9 +105,6 @@ def runAlgorithm():
             client.close()
             break
 
-    # client.close()
-
 # Run the system
 if __name__ =='__main__':
-    # runAlgorithm()
-    testAlgorithm()
+    runAlgorithm()

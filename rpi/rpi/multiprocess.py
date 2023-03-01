@@ -24,7 +24,7 @@ class MultiProcess:
         self.AND = Android()
         self.ALG = Algo()
         self.STM = STM()
-
+        self.obslst = []
         self.manager = Manager()
 
         self.to_AND_message_queue = self.manager.Queue()
@@ -89,28 +89,24 @@ class MultiProcess:
         while True:
             try:
                 message = self.AND.read_from_AND()
-                print("Reading from AND")
+                print("Reading from ANDROID")
                 if message is None:
                     continue
-
                 message_list = message.decode().splitlines()
                 print(f"AND_MESSAGE: {message_list}")
                 for msg in message_list:
                     if len(msg) != 0:
-
                         messages = msg.split('|', 1)
-
                         if messages[0] == 'ALGO':
-                            print(Fore.BLUE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
+                            print(Fore.LIGHTGREEN_EX + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for('ALG', (messages[1]).encode()))
                             print('queued')
-                        # Message format for Image Rec: RPI|TOCAM
                         elif messages[0] == 'RPI':
-                            print(Fore.BLUE + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
                             self.image_queue.put_nowait('take')
                         elif messages[0] == 'RPI_END':
-                            print(Fore.BLUE + 'ALG > %s' % (str(messages[0])))
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
                             sys.exit()
                         else:
@@ -124,44 +120,31 @@ class MultiProcess:
     def _read_ALG(self):
         while True:
             try:
-                print("read msg from algo")
+                print("Read Command Message from ALGO")
                 message = self.ALG.read_from_ALG()
-                print("msg before split ",message)
+                print("Message before split ",message)
                 if message is None:
                     continue
-                message_list = message.split(",")
-                print("msglist: ", message_list)
+                messages = message.split('$',1)
+                message_list = messages[0].split(",")
+                print("Command Msg List : ", message_list)
+                self.obslst = messages[1].split(",")
+                print("Obst Msg List : ", self.obslst)
+
                 for msg in message_list:
                     if len(msg) != 0:
-
                         messages = msg.split('|', 1)
-
-                        # Message format for Image Rec: RPI|TOCAM
-                        if messages[0] == 'RPI':
+                        if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
                             self.image_queue.put_nowait('take')
-                        elif messages[0] == 'RPI_END':
+                        elif messages[0] == 'RPI_END': # quit
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
                             sys.exit()
-                        # elif messages[0] == 'AND_PATH':
-                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                        #     self.to_AND_message_queue.put_nowait(messages[1].encode())
-                        # elif messages[0] == 'AND_IMAGE':
-                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                        #     self.to_AND_message_queue.put_nowait(messages[1].encode())
-                        # elif messages[0] == 'RPI_END':
-                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
-                        #     print("RPI ENDING NOW...")
-                        #     sys.exit()
-                        # elif messages[0] == 'AND_PATH':
-                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                        #     self.to_AND_message_queue.put_nowait(messages[1].encode())
-                        elif messages[0] == "STM":
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            # self.to_AND_message_queue.put_nowait(messages[1].encode())
-                            self.STM.write_to_STM(messages[1])
-                        #    self.ALG.write_to_ALG(str('CMPLT').encode())
+                        elif messages[0] == 'STM': # stm
+                            print(Fore.LIGHTCYAN_EX + 'To STM: before write_to_STM method')
+                            self.STM.write_to_STM(str(messages[1]))
+                            print(Fore.LIGHTCYAN_EX + 'To STM: after write_to_STM method')
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
@@ -169,7 +152,6 @@ class MultiProcess:
                             self.to_AND_message_queue.put_nowait(messages[1].encode())
 
             except Exception as e:
-        
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 
@@ -185,7 +167,6 @@ class MultiProcess:
                 message_list = message.decode().splitlines()
                 for msg in message_list:
                     if len(msg) != 0:
-#                         print("msg receive from stm: "+msg)
                         messages = msg.split('|', 1)
 
                         if messages[0] == 'AND':
@@ -228,14 +209,12 @@ class MultiProcess:
                     print(payload)
                     if target == 'ALG':
                         self.ALG.write_to_ALG(payload)
-                        
-                        print('once')
-                        print('sending to algo')
+                        print('Sending to algo via _write_target()')
                         time.sleep(0.5)
                     elif target == 'STM':
-                        print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
+                        print(Fore.LIGHTCYAN_EX + 'To STM: before write_to_STM method')
                         self.STM.write_to_STM(payload)
-                        print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
+                        print(Fore.LIGHTCYAN_EX + 'To STM: after write_to_STM method')
                     elif target == 'AND_PATH' or target == 'AND':
                         time.sleep(1)
                         self.AND.write_to_AND(payload)
@@ -254,7 +233,6 @@ class MultiProcess:
                 break
 
     def _take_pic(self):
-            # Start the Image Rec process
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
             while True:
                 try:
@@ -268,33 +246,21 @@ class MultiProcess:
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
 
-                        # Reply received from the Image Processing Server
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
-                        print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
-                        #self.ALG.write_to_ALG(str('CMPLT').encode())
-                        # #Messages sent to ALG & AND')
-                        if self.reply == 'n':
-                            # print("Message received from IMG REC PC is NULL")
+                        print('Reply message: ' + self.reply)
+
+                        if self.reply == 'n': # no object found
                             self.reply = 'n'
-                            # self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
-                            #self.ALG.write_to_ALG(str('CMPLT').encode()) # comment for main day
-
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+                            print(Fore.LIGHTYELLOW_EX + 'Message send across to Rpi: ' + self.reply)
                             
-                        else:
-                            # msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
-                            # print("[IMG REC] Received message : ",str(self.reply),"\n")
-                            self.reply += '\n'
-                            # print(self.reply)
-
-                            # # DONT NEED TO SEND ALGO PC OUTPUT FOR THE FIRST TASK
-                            # self.message_queue.put_nowait(self._format_for('ALG',self.reply.encode()))
-                            # print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
-                            #self.ALG.write_to_ALG(str('CMPLT').encode()) # comment for main day
-
-                            # self.message_queue.put_nowait(self._format_for('AND',self.reply.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + self.reply)
+                        else: # object found
+                            cls_id = self.reply
+                            if len(self.obslst)>0:
+                                msg = 'AND|OBS-'+str(self.obslst[0])+'-'+str(cls_id)
+                                self.obslst.pop(0)
+                            self.message_queue.put_nowait(self._format_for('AND', msg.encode()))
+                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg)
 
                         self.camera.close()
                         break

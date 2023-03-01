@@ -83,12 +83,8 @@ class Algo:
 
     def read_from_ALG(self):
         try:
-            # msg = self.client.recv()
             msg = self.client.recv(ALGORITHM_SOCKET_BUFFER_SIZE)
             data = msg.decode()
-            # Converting the string to an array
-            # arr = np.array(data.split(','), dtype=np.int)
-
             print("Received command:", data)
 
             if len(data) > 0:
