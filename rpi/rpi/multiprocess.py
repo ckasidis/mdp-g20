@@ -202,24 +202,24 @@ class MultiProcess:
         while True:
             target = None
             try:
-                #if not self.message_queue.empty():
-                    #message = self.message_queue.get_nowait()
-                print("msg :"+str(message))    
-                target, payload = message['target'], message['payload']
-                print(payload)
-                if target == 'ALG':
-                    self.ALG.write_to_ALG(payload)
-                    print('Sending to algo via _write_target()')
-                    time.sleep(0.5)
-                elif target == 'STM':
-                    print(Fore.LIGHTCYAN_EX + 'To STM: before write_to_STM method')
-                    self.STM.write_to_STM(payload)
-                    print(Fore.LIGHTCYAN_EX + 'To STM: after write_to_STM method')
-                elif target == 'AND_PATH' or target == 'AND':
-                    time.sleep(1)
-                    self.AND.write_to_AND(payload)
-                else:
-                    continue
+                if not self.message_queue.empty():
+                    message = self.message_queue.get_nowait()
+                    print("msg :"+str(message))    
+                    target, payload = message['target'], message['payload']
+                    print(payload)
+                    if target == 'ALG':
+                        self.ALG.write_to_ALG(payload)
+                        print('Sending to algo via _write_target()')
+                        time.sleep(0.5)
+                    elif target == 'STM':
+                        print(Fore.LIGHTCYAN_EX + 'To STM: before write_to_STM method')
+                        self.STM.write_to_STM(payload)
+                        print(Fore.LIGHTCYAN_EX + 'To STM: after write_to_STM method')
+                    elif target == 'AND_PATH' or target == 'AND':
+                        time.sleep(1)
+                        self.AND.write_to_AND(payload)
+                    else:
+                        continue
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-WRITE-%s ERROR] %s' % (str(target), str(e)))
@@ -236,8 +236,8 @@ class MultiProcess:
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
             while True:
                 try:
-                    if not self.image_queue.empty():
-                        test = self.image_queue.get_nowait()
+                    #if not self.image_queue.empty():
+                        #test = self.image_queue.get_nowait()
                         self.rpi_name = socket.gethostname()
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                         self.rawCapture = PiRGBArray(self.camera)
