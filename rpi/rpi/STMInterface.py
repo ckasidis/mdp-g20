@@ -69,37 +69,24 @@ class STM:
             if self.STM_connection is None:
                 print('[STM-CONN] STM is not connected. Trying to connect...')
                 self.connect_STM()
-
             print('In STM: write to STM method: before Transmitted to STM:')
             print('\t %s' % message)
-            self.STM_connection.write(message)
-            print(message.decode()+" sent")
+            self.STM_connection.write(message.encode())
+            print(message +" sent")
             print('In STM: write to STM method: after Transmitted to STM')
-
+            while True:
+                if self.STM_connection is None:
+                    print('[STM-CONN] STM is not connected. Trying to connect...')
+                    self.connect_STM()
+                raw_dat = self.STM_connection.read(1)
+                print("raw_dat: " + str(raw_dat))
+                dat = raw_dat.strip().decode()
+                if dat == 'R':
+                    print("received R reply from STM")
+                    break
         except Exception as e:
             print('[STM-WRITE Error] %s' % str(e))
             raise e
-        
-    def move(self, instr):
-        # for instr in instr_list:
-        print("move()")
-        self.write_to_STM(instr.encode())
-        while True:
-            print("move() while loop")
-            bytesToRead = self.STM_connection.inWaiting()
-            raw_dat = self.STM_connection.read(1)
-            print("raw_dat: " + str(raw_dat))
-            dat = raw_dat.strip().decode()
-            # test_dat = raw_dat.decode().strip()
-            # test_decode = raw_dat.decode()
-            # print("test_dat: " + test_dat)
-            # print("test_decode: " + test_decode)
-            if dat == 'R':
-                print("received R reply from STM")
-                break
-                # reply = str(dat.decode())
-                # return reply
-                # break
 
         print("exiting move while loop")
 

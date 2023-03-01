@@ -160,7 +160,7 @@ class MultiProcess:
                         elif messages[0] == "STM":
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             # self.to_AND_message_queue.put_nowait(messages[1].encode())
-                            self.STM.move(messages[1])
+                            self.STM.write_to_STM(messages[1])
                         #    self.ALG.write_to_ALG(str('CMPLT').encode())
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
@@ -234,12 +234,6 @@ class MultiProcess:
                         time.sleep(0.5)
                     elif target == 'STM':
                         print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
-#                         steps = ""
-#                         for i in range(20):
-#                             steps+= "a"
-#                         for i in len(payload):
-#                             steps[i] = payload[i]
-#                         print(len(steps))
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
                     elif target == 'AND_PATH' or target == 'AND':
