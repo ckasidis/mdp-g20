@@ -137,6 +137,7 @@ class MultiProcess:
                         if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
                             self.image_queue.put_nowait('take')
+                            time.sleep(5)
                         elif messages[0] == 'RPI_END': # quit
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
@@ -267,7 +268,7 @@ class MultiProcess:
 
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
 
-                        time.sleep(2)
+                        # time.sleep(2)
                         break
                 
                 except Exception as e:
