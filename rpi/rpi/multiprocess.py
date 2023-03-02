@@ -239,8 +239,10 @@ class MultiProcess:
                 try:
                     print('checking if image queue is empty or not')
                     if not self.image_queue.empty():
+                        print("the image queue size is", self.image_queue.qsize())
                         print("the image queue is not empty")
                         q = self.image_queue.get()
+                        print("the image queue size after dequeue is", self.image_queue.qsize())
                         print("queue top take_pic():", str(q))
                         self.rpi_name = socket.gethostname()
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
