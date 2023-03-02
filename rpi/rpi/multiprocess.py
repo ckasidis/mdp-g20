@@ -246,7 +246,9 @@ class MultiProcess:
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
                         print('self.image: ' ,self.image)
-
+                        self.camera.stop_preview()
+                        self.camera.close()
+                        
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
                         print('Reply message: ' + self.reply)
@@ -262,9 +264,9 @@ class MultiProcess:
                                 self.obslst.pop(0)
                             print("msg_to_send_AND: " , msg_to_send_AND)
                             self.message_queue.put_nowait(self._format_for('AND', msg_to_send_AND.encode()))
+
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
-                        self.camera.stop_preview()
-                        self.camera.close()
+
                         time.sleep(2)
                         break
                 
