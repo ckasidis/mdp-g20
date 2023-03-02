@@ -11,7 +11,7 @@ from picamera import PiCamera
 import socket
 import cv2
 import imagezmq
-
+import random
 
 from picamera.array import PiRGBArray
 
@@ -30,7 +30,7 @@ class MultiProcess:
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
     
-        
+        self.cnt=1
         self.read_AND_process = Process(target=self._read_AND)
         self.read_ALG_process = Process(target=self._read_ALG)
         self.read_STM_process = Process(target=self._read_STM)
@@ -136,8 +136,8 @@ class MultiProcess:
                         messages = msg.split('|', 1)
                         if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
-                            self.image_queue.put_nowait('take')
-                            time.sleep(5)
+                            self.image_queue.put_nowait(random())
+                            # time.sleep(5)
                         elif messages[0] == 'RPI_END': # quit
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
