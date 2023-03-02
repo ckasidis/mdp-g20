@@ -237,6 +237,7 @@ class MultiProcess:
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
             while True:
                 try:
+                    print('checking if image queue is empty or not')
                     if not self.image_queue.empty():
                         print("the image queue is not empty")
                         q = self.image_queue.get_nowait()
@@ -268,11 +269,11 @@ class MultiProcess:
                                 self.obslst.pop(0)
                             print("msg_to_send_AND: " , msg_to_send_AND)
                             self.message_queue.put_nowait(self._format_for('AND', msg_to_send_AND.encode()))
-
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
 
                         # time.sleep(2)
                         break
-                
+                    else:
+                        print('the image queue was empty')
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
