@@ -7,8 +7,7 @@ from algorithm_utils import main, fixCommands
 from re import M
 import socket
 import json
-import algotest
-
+from algotest import *
 from colorama import *
 init(autoreset=True)
 # print(sys.version)
@@ -80,19 +79,16 @@ def runAlgorithm():
             with open(filename1, "w") as f: # Store the data in a json file
                 json.dump(data2, f, indent=4)
 
-            commands, obsOrder = RunMain(map_dir=filename1, cmd_dir=filename2) # Execute the main function and store cmds
+            commands, obsOrder = RunMain() # Execute the main function and store cmds
             # commands = fixCommands(commands)
             print("\nFull list of STM commands till last obstacle:")
             print(f'{commands}') # View the commands/actions generated
             print(f'The order of visiting obstacles is:\n',obsOrder)
             all_cmd_str = ','.join(str(e) for e in commands)
             all_obs_str = ','.join(str(e) for e in obsOrder)
-            all_str = all_cmd + "$" + all_obs_str
+            all_str = all_cmd_str + "$" + all_obs_str
             client.send(all_str)
-            # print("Sent path commands to RPi\n")
-            # client.send(all_obs_str)
-            # print("Sent obstacles order to RPi")
-            client.close()
+            # client.close()
             # break
             
 

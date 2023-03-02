@@ -6,7 +6,7 @@ import json
 
 
 def ReadWriteConvert():
-    file = r"C:\Users\siddh\Desktop\mdp-g20\rpi\rpi\algorithm_rpi\AcquirefromAndroid.json"
+    file = r"C:\Users\siddh\Desktop\mdp-g20\rpi\rpi\algorithm_rpi\mapFromAndroid.json"
     maze = []
     for i in range(22):
         inner = []
@@ -19,17 +19,38 @@ def ReadWriteConvert():
                 continue
             inner.append(0)
         maze.append(inner)
-
+    obstacles=[]
     with open(file) as json_file:
-        obstacles = json.load(json_file)
+        data = json.load(json_file)
+        obs = data[1:len(obstacles) - 1]
+        obs = obs.split('],')
+
+        for ob in obs:
+            print("ob:",ob)
+            if ob[-1]==']':
+                obj = ob[1:-1]    
+            else:
+                obj = ob[1:]
+            print("obj1:",obj)
+            obj = obj.split(',')
+            obj[0] = int(obj[0])
+            obj[1] = int(obj[1])
+            obj[2] = obj[2][1]
+            obj[3] = int(obj[3])
+            print("obj:",obj)
+
+            # print(obj[2][0])
+            obstacles.append(obj)
 
     GOALLIST = []
     GOALLIST.append([2, 2, 'E', 0])
     ObstacleList = []
     # Convert the list of obstacles to fit the tree
     for i in range(len(obstacles)):
-        obstacles[i][0] += 1
-        obstacles[i][1] += 1
+        obstacles[i][0] = int(obstacles[i][0])+1
+        obstacles[i][1] = int(obstacles[i][1]) +1
+        # obstacles[i][0] += 1
+        # obstacles[i][1] += 1
 
         if (obstacles[i][2] == "E"):
             obstacles[i][2] = "S"
@@ -928,12 +949,20 @@ def finalmain():
     while (True):
         if "FW" in ActionsWCamera[i] and "FW" in ActionsWCamera[i + 1]:
             Total = int(ActionsWCamera[i][2:]) + int(ActionsWCamera[i + 1][2:])
-            ActionsWCamera[i + 1] = "FW" + str(Total)
+            if Total>=100:
+                ActionsWCamera[i + 1] = "FW" + str(Total)
+            else:
+                ActionsWCamera[i + 1] = "FW0" + str(Total)
             del (ActionsWCamera[i])
             continue
         if "BW" in ActionsWCamera[i] and "BW" in ActionsWCamera[i + 1]:
             Total = int(ActionsWCamera[i][2:]) + int(ActionsWCamera[i + 1][2:])
-            ActionsWCamera[i + 1] = "BW" + str(Total)
+            if Total>=100:
+                print(Total)
+                ActionsWCamera[i + 1] = "BW" + str(Total)
+            else:
+                print(Total)
+                ActionsWCamera[i + 1] = "BW0" + str(Total)
             del (ActionsWCamera[i])
             continue
 
@@ -960,40 +989,10 @@ def fix_Commands(commands):
 
     # cmds.append("RPI_END|0")  # add stop word
     return cmds
-    # print("Commands after fix 1:\n", cmds)
-    # grouped_L = [(k, sum(1 for i in g)) for k, g in groupby(cmds)]
-    # print("Counted:\n", grouped_L)
-    # new_cmds = []
-    # for i in grouped_L:
-    #     cmd = i[0].split("|", 1)[1]
-    #     cnt = i[1]
-    #     if cnt < 10:
-    #         if cmd == "FW010":
-    #             newCmd = "STM|FW0" + str(i[1]) + "0"
-    #             new_cmds.append(newCmd)
-    #         elif cmd == "BW010":
-    #             newCmd = "STM|BW0" + str(i[1]) + "0"
-    #             new_cmds.append(newCmd)
-    #         else:
-    #             for j in range(cnt):
-    #                 new_cmds.append(i[0])
-    #     elif cnt >= 10:
-    #         if cmd == "FW010":
-    #             newCmd = "STM|FW" + str(i[1]) + "0"
-    #             new_cmds.append(newCmd)
-    #         elif cmd == "BW010":
-    #             newCmd = "STM|BW" + str(i[1]) + "0"
-    #             new_cmds.append(newCmd)
-    #         else:
-    #             for j in range(cnt):
-    #                 new_cmds.append(i[0])
-    # # print(new_cmds)
-    # return new_cmds
-    # print("commands after fix 2:\n", new_cmds)
 
 
 def RunMain():
-    data1 = finalmain()
+    data1, obsVisit = finalmain()
     data = fix_Commands(data1)
     print("\n\n\n\n", data)
-    return data
+    return data, obsVisit
