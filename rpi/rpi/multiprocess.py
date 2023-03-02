@@ -136,7 +136,7 @@ class MultiProcess:
                         messages = msg.split('|', 1)
                         if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
-                            self.image_queue.put_nowait(random())
+                            self.image_queue.put(random.randint())
                             # time.sleep(5)
                         elif messages[0] == 'RPI_END': # quit
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
@@ -240,7 +240,7 @@ class MultiProcess:
                     print('checking if image queue is empty or not')
                     if not self.image_queue.empty():
                         print("the image queue is not empty")
-                        q = self.image_queue.get_nowait()
+                        q = self.image_queue.get()
                         print("queue top take_pic():", str(q))
                         self.rpi_name = socket.gethostname()
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
