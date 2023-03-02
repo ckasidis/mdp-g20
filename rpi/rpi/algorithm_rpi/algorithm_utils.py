@@ -26,7 +26,7 @@ def main(map_dir, cmd_dir):
         Obstaclevisit = []
         for i in range(len(GOALLIST)):
             Obstaclevisit.append("AND|OBS-" + str(GOALLIST[i].pop()))
-        for i in range(len(GOALLIST)):    
+        for i in range(len(GOALLIST)):
             GOALLIST[i] = tuple(GOALLIST[i])
         write_json(Obstaclevisit, filename="ObjectIDsequence.json")
 
@@ -62,7 +62,7 @@ def main(map_dir, cmd_dir):
                     temp.append(tuple(tempSideGoal))
                     maze[tempSideGoal[0], tempSideGoal[1]] = 0.5
             GOALLIST[i] = temp
-            
+
         mazegraph = maze_to_graph(maze)
 
         # Print the edges with weights
@@ -74,7 +74,8 @@ def main(map_dir, cmd_dir):
         lol = []
         FinalActions = []
         for i in range(len(GOALLIST) - 1):
-            nodesExplored, pathsExplored, nodesProcessed, currentNode = astar_search(mazegraph, start=GOALLIST[i], goal=GOALLIST[i + 1])
+            nodesExplored, pathsExplored, nodesProcessed, currentNode = astar_search(mazegraph, start=GOALLIST[i],
+                                                                                     goal=GOALLIST[i + 1])
             GOALLIST[i + 1] = currentNode
             # print(nodesExplored[(2, 6, 'E')])
             path, cantreachgoal, actions = reconstruct_path(nodesExplored, start=GOALLIST[i], goal=currentNode)
@@ -85,6 +86,25 @@ def main(map_dir, cmd_dir):
             # print("path", i, "=", path)
             ActionsWCamera += actions
             ActionsWCamera.append('Camera')
+
+            i = 0
+            while (True):
+                if "FW" in ActionsWCamera[i] and "FW" in ActionsWCamera[i + 1]:
+                    Total = int(ActionsWCamera[i][2:]) + int(ActionsWCamera[i + 1][2:])
+                    ActionsWCamera[i + 1] = "FW" + str(Total)
+                    del (ActionsWCamera[i])
+                    continue
+                if "BW" in ActionsWCamera[i] and "BW" in ActionsWCamera[i + 1]:
+                    Total = int(ActionsWCamera[i][2:]) + int(ActionsWCamera[i + 1][2:])
+                    ActionsWCamera[i + 1] = "BW" + str(Total)
+                    del (ActionsWCamera[i])
+                    continue
+
+                if (i == len(ActionsWCamera) - 1):
+                    break
+                i += 1
+
+            print("Concat Actions:", ActionsWCamera)
 
         # print("Actions sent with Camera", ActionsWCamera)
         data = ActionsWCamera
@@ -183,36 +203,58 @@ def ReadWriteConvert(filename="AcquireFromAndriod.json"):
         elif (obstacles[i][2] == "W"):
             obstacles[i][2] = "N"
 
-    # print(obstacles)
+    print(obstacles)
+
+    goalincrement = 3
 
     for i in range(len(obstacles)):
         Direction = obstacles[i][2]
         Xcoords = obstacles[i][0]
         Ycoords = obstacles[i][1]
         obstacleid = obstacles[i][3]
+
         maze[Xcoords][Ycoords] = 1
+        maze[Xcoords - 1][Ycoords + 1] = 0.7  # topleft
+        maze[Xcoords][Ycoords + 1] = 0.7  # top
+        maze[Xcoords + 1][Ycoords + 1] = 0.7  # top right
+        maze[Xcoords + 1][Ycoords] = 0.7  # right
+        maze[Xcoords + 1][Ycoords - 1] = 0.7  # bottom right
+        maze[Xcoords][Ycoords - 1] = 0.7  # bottom
+        maze[Xcoords - 1][Ycoords - 1] = 0.7  # bottomleft
+        maze[Xcoords - 1][Ycoords] = 0.7  # left
+
         if (Direction == "N"):
-            maze[Xcoords - 2][Ycoords] = 0.5
-            GOALLIST.append([Xcoords - 2, Ycoords, "S", obstacleid])
+            maze[Xcoords - goalincrement][Ycoords] = 0.5
+            GOALLIST.append([Xcoords - goalincrement, Ycoords, "S", obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "N"))
 
         elif (Direction == "S"):
-            maze[Xcoords + 2][Ycoords] = 0.5
-            GOALLIST.append([Xcoords + 2, Ycoords, "N",obstacleid])
+            maze[Xcoords + goalincrement][Ycoords] = 0.5
+
+            GOALLIST.append([Xcoords + goalincrement, Ycoords, "N", obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "S"))
 
         elif (Direction == "E"):
-            maze[Xcoords][Ycoords + 2] = 0.5
-            GOALLIST.append([Xcoords, Ycoords + 2, "W", obstacleid])
+            maze[Xcoords][Ycoords + goalincrement] = 0.5
+            GOALLIST.append([Xcoords, Ycoords + goalincrement, "W", obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "E"))
 
         elif (Direction == "W"):
-            maze[Xcoords][Ycoords - 2] = 0.5
-            GOALLIST.append([Xcoords, Ycoords - 2, "E",obstacleid])
+            maze[Xcoords][Ycoords - goalincrement] = 0.5
+            GOALLIST.append([Xcoords, Ycoords - goalincrement, "E", obstacleid])
             ObstacleList.append((Xcoords - 1, Ycoords - 1, "W"))
 
         else:
-            ObstacleList.append([Xcoords - 1, Ycoords - 1, "NIL"])
+            ObstacleList.append([Xcoords - 1, Ycoords - 1, "NIL", obstacleid])
+
+    print("Obstaclelist=", ObstacleList)
+    print("Goallist=", GOALLIST)
+
+    for i in range(22):
+        maze[0][i] = 1
+        maze[21][i] = 1
+        maze[i][0] = 1
+        maze[i][21] = 1
 
     maze = np.array(maze)
 
@@ -339,6 +381,13 @@ def maze_to_graph(mazeGrid):
     mazeGraph = MazeGraph()  # this initialize the class to mazeGraph
     (height, width) = mazeGrid.shape  # numpy array dimensions into a tuple?
 
+    fwleftarr = ["FL090", "FW016"]
+    fwrightarr = ["FR090", "FW016"]
+    bkrightarr = ["BW014", "BR090"]
+    bkleftarr = ["BW014", "BL090"]
+
+    ObstBoundary = 0.7
+
     for i in range(height):
         for j in range(width):
 
@@ -350,24 +399,49 @@ def maze_to_graph(mazeGrid):
 
                 for d in directions:
                     neighbors = []
+                    #                 if (i> 1) and mazeGrid[i-2,j] != 1 and mazeGrid[i-2,j+1] !=1 and mazeGrid[i-2, j-1]!=1:  #if the mazegrid is top is not an obstacle
+                    #                     neighbors.append(((i-1,j), 1)) #append a tuple in a tuple to the neighbour
+
+                    #                 # Adjacent cell : Left
+                    #                 if (j> 1)  and mazeGrid[i,j-2] != 1 and mazeGrid[i-1, j-2] !=1 and mazeGrid[i+1, j-2]!=1:
+                    #                     neighbors.append(((i,j-1), 1))
+
+                    #                 # Adjacent cell : Bottom
+                    #                 if (i < height - 2)  and  mazeGrid[i+2,j] != 1 and mazeGrid[i+2,j+1] != 1 and mazeGrid[i+2,j-1] != 1:
+                    #                     neighbors.append(((i+1,j), 1))
+
+                    #                 # Adjacent cell : Right
+                    #                 if (j < width - 2)  and mazeGrid[i,j+2] != 1 and mazeGrid[i-1,j+2] != 1 and mazeGrid[i+1,j+2] != 1: #this check maybe out of range
+                    #                     neighbors.append(((i,j+1), 1))
+
+                    # moveforwardinthecurrentdirection.
+
                     if (d == "N"):
                         # move forward
                         if (i > 1) and mazeGrid[i - 2, j] != 1 and mazeGrid[i - 2, j + 1] != 1 and mazeGrid[
                             i - 2, j - 1] != 1:
-                            neighbors.append(((i - 1, j, d), 1, ["FW010"]))
+                            if mazeGrid[i - 2, j] == ObstBoundary or mazeGrid[i - 2, j + 1] == ObstBoundary or mazeGrid[
+                                i - 2, j - 1] == ObstBoundary:
+                                neighbors.append(((i - 1, j, d), 500, ["FW010"]))
+                            else:
+                                neighbors.append(((i - 1, j, d), 1, ["FW010"]))
 
                         # move backwards
                         if (i < height - 2) and mazeGrid[i + 2, j] != 1 and mazeGrid[i + 2, j + 1] != 1 and mazeGrid[
                             i + 2, j - 1] != 1:
-                            neighbors.append(((i + 1, j, d), 1, ["BW010"]))
+                            if mazeGrid[i + 2, j] == 0.7 or mazeGrid[i + 2, j + 1] == 0.7 or mazeGrid[
+                                i + 2, j - 1] == 0.7:
+                                neighbors.append(((i + 1, j, d), 500, ["BW010"]))
+                            else:
+                                neighbors.append(((i + 1, j, d), 1, ["BW010"]))
 
                         # forward left turn
                         exit = False
-                        if (j > 3 and i > 3):  # ensure that it is within the border
-                            for row in range(1, 4):
+                        if (j > 4 and i > 4):  # ensure that it is within the border
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j - col] == 1):
                                         exit = True
                                         break
@@ -375,20 +449,31 @@ def maze_to_graph(mazeGrid):
                                         i - row, j + 1] == 1):
                                         exit = True
                                         break
+
                         else:
                             exit = True
 
                         if (exit == False):
-                            neighbors.append(
-                                ((i - 2, j - 2, "W"), 100, ["FL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j - col] == 0.7):
+                                        neighbors.append(((i - 3, j - 3, "W"), 1000, fwleftarr))
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j - 3, "W"), 100, fwleftarr))  # increase weights to reduce turning
 
                         # forward right turning
                         exit = False
-                        if (i > 3 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i > 4 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j + col] == 1):
                                         exit = True
                                         break
@@ -400,16 +485,26 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j + 2, "E"), 100, ["FR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j + col] == 0.7):
+                                        neighbors.append(((i - 3, j + 3, "E"), 1000, fwrightarr))
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j + 3, "E"), 100, fwrightarr))  # increase weights to reduce turning
 
                         # Backward left Turning
                         exit = False
-                        if (i < height - 4 and j > 3):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j - col] == 1):
                                         exit = True
                                         break
@@ -421,16 +516,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j - 2, "E"), 100, ["BL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j - col] == 0.7):
+                                        neighbors.append(((i + 3, j - 3, "E"), 1000,
+                                                          bkleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(((i + 3, j - 3, "E"), 100,
+                                                  bkleftarr))  # increase weights to reduce turning
 
                         # Backwards Right Turning
                         exit = False
-                        if (i < height - 4 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j + col] == 1):
                                         exit = True
                                         break
@@ -442,8 +548,19 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j + 2, "W"), 100, ["BR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j + col] == 0.7):
+                                        neighbors.append(((i + 3, j + 3, "W"), 1000,
+                                                          bkrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j + 3, "W"), 100, bkrightarr))  # increase weights to reduce turning
 
                         # Insert edges in the graph
                         if len(neighbors) > 0:  # if there exist neighbors
@@ -453,20 +570,28 @@ def maze_to_graph(mazeGrid):
                         # move forwards
                         if (i < height - 2) and mazeGrid[i + 2, j] != 1 and mazeGrid[i + 2, j + 1] != 1 and mazeGrid[
                             i + 2, j - 1] != 1:
-                            neighbors.append(((i + 1, j, d), 1, ["FW010"]))
+                            if mazeGrid[i + 2, j] == 0.7 or mazeGrid[i + 2, j + 1] == 0.7 or mazeGrid[
+                                i + 2, j - 1] == 0.7:
+                                neighbors.append(((i + 1, j, d), 500, ["FW010"]))
+                            else:
+                                neighbors.append(((i + 1, j, d), 1, ["FW010"]))
 
                         # move backwards
                         if (i > 1) and mazeGrid[i - 2, j] != 1 and mazeGrid[i - 2, j + 1] != 1 and mazeGrid[
                             i - 2, j - 1] != 1:
-                            neighbors.append(((i - 1, j, d), 1, ["BW010"]))
+                            if mazeGrid[i - 2, j] == 0.7 or mazeGrid[i - 2, j + 1] == 0.7 or mazeGrid[
+                                i - 2, j - 1] == 0.7:
+                                neighbors.append(((i - 1, j, d), 500, ["BW010"]))
+                            else:
+                                neighbors.append(((i - 1, j, d), 1, ["BW010"]))
 
                         # move forward left turning
                         exit = False
-                        if (i < height - 4 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j + col] == 1):
                                         exit = True
                                         break
@@ -478,16 +603,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j + 2, "E"), 100, ["FL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j + col] == 0.7):
+                                        neighbors.append(((i + 3, j + 3, "E"), 1000,
+                                                          fwleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j + 3, "E"), 100, fwleftarr))  # increase weights to reduce turning
 
                         # move forward right turning
                         exit = False
-                        if (i < height - 4 and j > 3):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j - col] == 1):
                                         exit = True
                                         break
@@ -499,16 +635,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j - 2, "W"), 100, ["FR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j - col] == 0.7):
+                                        neighbors.append(((i + 3, j - 3, "W"), 1000,
+                                                          fwrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j - 3, "W"), 100, fwrightarr))  # increase weights to reduce turning
 
                         # move backwards left turning
                         exit = False
-                        if (i > 3 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i > 4 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j + col] == 1):
                                         exit = True
                                         break
@@ -520,16 +667,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j + 2, "W"), 100, ["BL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j + col] == 0.7):
+                                        neighbors.append(((i - 3, j + 3, "W"), 1000,
+                                                          bkleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j + 3, "W"), 100, bkleftarr))  # increase weights to reduce turning
 
                         # move backwards right turning
                         exit = False
-                        if (j > 3 and i > 3):
-                            for row in range(1, 4):
+                        if (j > 4 and i > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j - col] == 1):
                                         exit = True
                                         break
@@ -541,8 +699,19 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j - 2, "E"), 100, ["BR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j - col] == 0.7):
+                                        neighbors.append(((i - 3, j - 3, "E"), 1000,
+                                                          bkrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j - 3, "E"), 100, bkrightarr))  # increase weights to reduce turning
 
                         # Insert edges in the graph
                         if len(neighbors) > 0:  # if there exist neighbors
@@ -552,20 +721,28 @@ def maze_to_graph(mazeGrid):
                         # move forwards
                         if (j > 1) and mazeGrid[i, j - 2] != 1 and mazeGrid[i - 1, j - 2] != 1 and mazeGrid[
                             i + 1, j - 2] != 1:
-                            neighbors.append(((i, j - 1, d), 1, ["FW010"]))
+                            if (mazeGrid[i, j - 2] == 0.7 or mazeGrid[i - 1, j - 2] == 0.7 or mazeGrid[
+                                i + 1, j - 2] == 0.7):
+                                neighbors.append(((i, j - 1, d), 500, ["FW010"]))
+                            else:
+                                neighbors.append(((i, j - 1, d), 1, ["FW010"]))
 
                         # move backwards
                         if (j < width - 2) and mazeGrid[i, j + 2] != 1 and mazeGrid[i - 1, j + 2] != 1 and mazeGrid[
                             i + 1, j + 2] != 1:
-                            neighbors.append(((i, j + 1, d), 1, ["BW010"]))
+                            if mazeGrid[i, j + 2] == 0.7 or mazeGrid[i - 1, j + 2] == 0.7 or mazeGrid[
+                                i + 1, j + 2] == 0.7:
+                                neighbors.append(((i, j + 1, d), 500, ["BW010"]))
+                            else:
+                                neighbors.append(((i, j + 1, d), 1, ["BW010"]))
 
                         # move forward left turn
                         exit = False
-                        if (i < height - 4 and j > 3):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j - col] == 1):
                                         exit = True
                                         break
@@ -577,16 +754,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j - 2, "S"), 100, ["FL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j - col] == 0.7):
+                                        neighbors.append(((i + 3, j - 3, "S"), 1000,
+                                                          fwleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j - 3, "S"), 100, fwleftarr))  # increase weights to reduce turning
 
                         # move forward right turn
                         exit = False
-                        if (j > 3 and i > 3):
-                            for row in range(1, 4):
+                        if (j > 4 and i > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j - col] == 1):
                                         exit = True
                                         break
@@ -598,16 +786,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j - 2, "N"), 100, ["FR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j - col] == 0.7):
+                                        neighbors.append(((i - 3, j - 3, "N"), 1000,
+                                                          fwrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j - 3, "N"), 100, fwrightarr))  # increase weights to reduce turning
 
                         # move backwards left turn
                         exit = False
-                        if (i < height - 4 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j + col] == 1):
                                         exit = True
                                         break
@@ -619,16 +818,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j + 2, "N"), 100, ["BL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j + col] == 0.7):
+                                        neighbors.append(((i + 3, j + 3, "N"), 1000,
+                                                          bkleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j + 3, "N"), 100, bkleftarr))  # increase weights to reduce turning
 
                         # move backwards right turn
                         exit = False
-                        if (i > 3 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i > 4 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j + col] == 1):
                                         exit = True
                                         break
@@ -641,8 +851,19 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j + 2, "S"), 100, ["BR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j + col] == 0.7):
+                                        neighbors.append(((i - 3, j + 3, "S"), 1000,
+                                                          bkrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j + 3, "S"), 100, bkrightarr))  # increase weights to reduce turning
 
                         # Insert edges in the graph
                         if len(neighbors) > 0:  # if there exist neighbors
@@ -652,20 +873,28 @@ def maze_to_graph(mazeGrid):
                         # move forward
                         if (j < width - 2) and mazeGrid[i, j + 2] != 1 and mazeGrid[i - 1, j + 2] != 1 and mazeGrid[
                             i + 1, j + 2] != 1:
-                            neighbors.append(((i, j + 1, d), 1, ["FW010"]))
+                            if mazeGrid[i, j + 2] == 0.7 or mazeGrid[i - 1, j + 2] == 0.7 or mazeGrid[
+                                i + 1, j + 2] == 0.7:
+                                neighbors.append(((i, j + 1, d), 500, ["FW010"]))
+                            else:
+                                neighbors.append(((i, j + 1, d), 1, ["FW010"]))
 
                         # move backwards
                         if (j > 1) and mazeGrid[i, j - 2] != 1 and mazeGrid[i - 1, j - 2] != 1 and mazeGrid[
                             i + 1, j - 2] != 1:
-                            neighbors.append(((i, j - 1, d), 1, ["BW010"]))
+                            if mazeGrid[i, j - 2] == 0.7 or mazeGrid[i - 1, j - 2] == 0.7 or mazeGrid[
+                                i + 1, j - 2] == 0.7:
+                                neighbors.append(((i, j - 1, d), 500, ["BW010"]))
+                            else:
+                                neighbors.append(((i, j - 1, d), 1, ["BW010"]))
 
                         # move forward right turn
                         exit = False
-                        if (i < height - 4 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j + col] == 1):
                                         exit = True
                                         break
@@ -675,17 +904,29 @@ def maze_to_graph(mazeGrid):
                                         break
                         else:
                             exit = True
+
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j + 2, "S"), 100, ["FR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j + col] == 0.7):
+                                        neighbors.append(((i + 3, j + 3, "S"), 1000,
+                                                          fwrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j + 3, "S"), 100, fwrightarr))  # increase weights to reduce turning
 
                         # move forward left turn
                         exit = False
-                        if (i > 3 and j < width - 4):
-                            for row in range(1, 4):
+                        if (i > 4 and j < width - 5):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j + col] == 1):
                                         exit = True
                                         break
@@ -697,16 +938,27 @@ def maze_to_graph(mazeGrid):
                         else:
                             exit = True
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j + 2, "N"), 100, ["FL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j + col] == 0.7):
+                                        neighbors.append(((i - 3, j + 3, "N"), 1000,
+                                                          fwleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j + 3, "N"), 100, fwleftarr))  # increase weights to reduce turning
 
                         # move backwards left turn
                         exit = False
-                        if (j > 3 and i > 3):
-                            for row in range(1, 4):
+                        if (j > 4 and i > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i - row, j - col] == 1):
                                         exit = True
                                         break
@@ -718,16 +970,27 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i - 2, j - 2, "S"), 100, ["BL090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i - row, j - col] == 0.7):
+                                        neighbors.append(((i - 3, j - 3, "S"), 1000,
+                                                          bkleftarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i - 3, j - 3, "S"), 100, bkleftarr))  # increase weights to reduce turning
 
                         # move backwards right turn
                         exit = False
-                        if (i < height - 4 and j > 3):
-                            for row in range(1, 4):
+                        if (i < height - 5 and j > 4):
+                            for row in range(2, 5):
                                 if exit == True:
                                     break
-                                for col in range(1, 4):
+                                for col in range(2, 5):
                                     if (mazeGrid[i + row, j - col] == 1):
                                         exit = True
                                         break
@@ -739,8 +1002,19 @@ def maze_to_graph(mazeGrid):
                             exit = True
 
                         if exit == False:
-                            neighbors.append(
-                                ((i + 2, j - 2, "N"), 100, ["BR090"]))  # increase weights to reduce turning
+                            denote = False
+                            for row in range(2, 5):
+                                if denote == True:
+                                    break
+                                for col in range(2, 5):
+                                    if (mazeGrid[i + row, j - col] == 0.7):
+                                        neighbors.append(((i + 3, j - 3, "N"), 1000,
+                                                          bkrightarr))  # increase weights to reduce turning
+                                        denote = True
+                                        break
+                            if denote == False:
+                                neighbors.append(
+                                    ((i + 3, j - 3, "N"), 100, bkrightarr))  # increase weights to reduce turning
 
                         if len(neighbors) > 0:  # if there exist neighbors
                             mazeGraph.edges[(i, j, d)] = neighbors
