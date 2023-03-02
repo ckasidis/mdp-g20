@@ -136,7 +136,7 @@ class MultiProcess:
                         messages = msg.split('|', 1)
                         if messages[0] == 'RPI': # camera
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), str(messages[1])))
-                            self.image_queue.put(random.randint())
+                            self.image_queue.put_nowait('task')
                             # time.sleep(5)
                         elif messages[0] == 'RPI_END': # quit
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
@@ -240,7 +240,7 @@ class MultiProcess:
                     if not self.image_queue.empty():
                         print("the image queue size is", self.image_queue.qsize())
                         print("the image queue is not empty")
-                        q = self.image_queue.get()
+                        q = self.image_queue.get_nowait()
                         print("the image queue size after dequeue is", self.image_queue.qsize())
                         print("queue top take_pic():", str(q))
                         self.rpi_name = socket.gethostname()
@@ -252,8 +252,8 @@ class MultiProcess:
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
                         print('self.image: ' ,self.image)
-                        # self.camera.stop_preview()
-                        # self.camera.close()
+                        self.camera.stop_preview()
+                        self.camera.close()
 
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
@@ -273,6 +273,6 @@ class MultiProcess:
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
 
                         # time.sleep(2)
-                        break
+
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))

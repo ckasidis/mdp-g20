@@ -958,38 +958,38 @@ def fix_Commands(commands):
         else:
             cmds.append("STM|" + i)
 
-    cmds.append("RPI_END|0")  # add stop word
-    # return cmds
-    print("Commands after fix 1:\n", cmds)
-    grouped_L = [(k, sum(1 for i in g)) for k, g in groupby(cmds)]
-    print("Counted:\n", grouped_L)
-    new_cmds = []
-    for i in grouped_L:
-        cmd = i[0].split("|", 1)[1]
-        cnt = i[1]
-        if cnt < 10:
-            if cmd == "FW010":
-                newCmd = "STM|FW0" + str(i[1]) + "0"
-                new_cmds.append(newCmd)
-            elif cmd == "BW010":
-                newCmd = "STM|BW0" + str(i[1]) + "0"
-                new_cmds.append(newCmd)
-            else:
-                for j in range(cnt):
-                    new_cmds.append(i[0])
-        elif cnt >= 10:
-            if cmd == "FW010":
-                newCmd = "STM|FW" + str(i[1]) + "0"
-                new_cmds.append(newCmd)
-            elif cmd == "BW010":
-                newCmd = "STM|BW" + str(i[1]) + "0"
-                new_cmds.append(newCmd)
-            else:
-                for j in range(cnt):
-                    new_cmds.append(i[0])
-    # print(new_cmds)
-    return new_cmds
-    print("commands after fix 2:\n", new_cmds)
+    # cmds.append("RPI_END|0")  # add stop word
+    return cmds
+    # print("Commands after fix 1:\n", cmds)
+    # grouped_L = [(k, sum(1 for i in g)) for k, g in groupby(cmds)]
+    # print("Counted:\n", grouped_L)
+    # new_cmds = []
+    # for i in grouped_L:
+    #     cmd = i[0].split("|", 1)[1]
+    #     cnt = i[1]
+    #     if cnt < 10:
+    #         if cmd == "FW010":
+    #             newCmd = "STM|FW0" + str(i[1]) + "0"
+    #             new_cmds.append(newCmd)
+    #         elif cmd == "BW010":
+    #             newCmd = "STM|BW0" + str(i[1]) + "0"
+    #             new_cmds.append(newCmd)
+    #         else:
+    #             for j in range(cnt):
+    #                 new_cmds.append(i[0])
+    #     elif cnt >= 10:
+    #         if cmd == "FW010":
+    #             newCmd = "STM|FW" + str(i[1]) + "0"
+    #             new_cmds.append(newCmd)
+    #         elif cmd == "BW010":
+    #             newCmd = "STM|BW" + str(i[1]) + "0"
+    #             new_cmds.append(newCmd)
+    #         else:
+    #             for j in range(cnt):
+    #                 new_cmds.append(i[0])
+    # # print(new_cmds)
+    # return new_cmds
+    # print("commands after fix 2:\n", new_cmds)
 
 
 def RunMain():
