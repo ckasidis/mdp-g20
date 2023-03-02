@@ -229,7 +229,7 @@ class MultiProcess:
                     self.dropped_connection.value = 0
 
                 elif target == 'ALG':
-                    self.dropped_connection.value = 1
+                    self.dropped_connection.value = 0
 
                 break
 
