@@ -42,7 +42,7 @@ while True:
             encoded_name = str(name).encode()    
             print("Object found, details are as follows:\nClass ID :\t{}\nConfidence :\t{}".format(name, confidence))
             imageHub.send_reply(encoded_name)
-            print(Fore.GREEN + "[IMGREC] Class ID {} sent to Raspberry Pi".format(name))
+            print("[IMGREC] Class ID {} sent to Raspberry Pi".format(name))
             # results.render()
             results.save()
             # results.show()
