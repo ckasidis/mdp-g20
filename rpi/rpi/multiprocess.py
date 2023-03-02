@@ -246,9 +246,9 @@ class MultiProcess:
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
                         print('self.image: ' ,self.image)
-                        self.camera.stop_preview()
-                        self.camera.close()
-                        
+                        # self.camera.stop_preview()
+                        # self.camera.close()
+
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
                         print('Reply message: ' + self.reply)
