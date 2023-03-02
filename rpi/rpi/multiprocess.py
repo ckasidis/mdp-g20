@@ -237,7 +237,6 @@ class MultiProcess:
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
             while True:
                 try:
-                    print('checking if image queue is empty or not')
                     if not self.image_queue.empty():
                         print("the image queue size is", self.image_queue.qsize())
                         print("the image queue is not empty")
@@ -275,7 +274,5 @@ class MultiProcess:
 
                         # time.sleep(2)
                         break
-                    else:
-                        print('the image queue was empty')
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
