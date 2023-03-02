@@ -238,10 +238,13 @@ class MultiProcess:
             while True:
                 try:
                     if not self.image_queue.empty():
+                        print("the image queue is not empty")
                         q = self.image_queue.get_nowait()
+                        print("queue top take_pic():", str(q))
                         self.rpi_name = socket.gethostname()
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                         self.rawCapture = PiRGBArray(self.camera)
+                        time.sleep(0.1) #to warmup
                         print("takepic(): ",self.rpi_name )
                         self.camera.capture(self.rawCapture, format="bgr")
                         self.image = self.rawCapture.array
