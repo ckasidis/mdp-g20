@@ -2,18 +2,18 @@ import serial
 import time
 from colorama import *
 
-import signal
+# import signal
 
 SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 
 init(autoreset=True)
 
-class TimeoutException(Exception):   # Custom exception class
-    pass
+# class TimeoutException(Exception):   # Custom exception class
+#     pass
 
-def timeout_handler(signum, frame):   # Custom signal handler
-    raise TimeoutException
+# def timeout_handler(signum, frame):   # Custom signal handler
+#     raise TimeoutException
 
 
 
@@ -88,12 +88,12 @@ class STM:
             self.STM_connection.write(message.encode())
             print(message +" sent")
             print('In STM: write to STM method: after Transmitted to STM')
-            signal.signal(signal.SIGALRM, timeout_handler)
+            # signal.signal(signal.SIGALRM, timeout_handler)
             while True:
-                # try:
+                try:
                     # Change the behavior of SIGALRM
-                    signal.alarm(5)
-                    try:
+                    # signal.alarm(5)
+                    # try:
                         if self.STM_connection is None:
                             print('[STM-CONN] STM is not connected. Trying to connect...')
                             self.connect_STM()
@@ -104,15 +104,15 @@ class STM:
                         if dat == 'R':
                             print("received R reply from STM")
                             break
-                    except TimeoutException:
-                        break # continue the for loop if function A takes more than 5 second
-                    else:
-                        # Reset the alarm
-                        signal.alarm(0)
-                # except Exception as e:
-                #     print("error caught in write_to_STM....trying again")
-                #     time.sleep(0.5)
-                #     continue
+                    # except TimeoutException:
+                    #     break # continue the for loop if function A takes more than 5 second
+                    # else:
+                    #     # Reset the alarm
+                    #     signal.alarm(0)
+                except Exception as e:
+                    print("error caught in write_to_STM....trying again")
+                    time.sleep(0.5)
+                    continue
         except Exception as e:
             print('[STM-WRITE Error] write_to_STM() function %s' % str(e))
             #raise e
