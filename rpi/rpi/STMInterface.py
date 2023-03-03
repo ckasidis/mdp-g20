@@ -99,6 +99,17 @@ class STM:
         
             #raise e
 
+    @break_after(5)
+    def read_rawdat_function(self):
+        raw_dat = self.STM_connection.read(1)
+        print("raw_dat: " + str(raw_dat))
+        dat = raw_dat.strip().decode()
+        if dat == 'R':
+            # print("received R reply from STM")
+            # break
+            return True
+        return Falses
+    
     # @break_after(5)
     def write_to_STM(self, message):
         try:
@@ -120,13 +131,14 @@ class STM:
                         # if self.STM_connection is None:
                         #     print('[STM-CONN] STM is not connected. Trying to connect...')
                         #     self.connect_STM()
-                        
-                        raw_dat = self.STM_connection.read(1)
-                        print("raw_dat: " + str(raw_dat))
-                        dat = raw_dat.strip().decode()
-                        if dat == 'R':
-                            print("received R reply from STM")
-                            break
+                    if read_rawdat_function():
+                        break
+                        # raw_dat = self.STM_connection.read(1)
+                        # print("raw_dat: " + str(raw_dat))
+                        # dat = raw_dat.strip().decode()
+                        # if dat == 'R':
+                        #     print("received R reply from STM")
+                        #     break
                     # except TimeoutException:
                     #     break # continue the for loop if function A takes more than 5 second
                     # else:
