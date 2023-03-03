@@ -117,11 +117,11 @@ class STM:
                     # Change the behavior of SIGALRM
                     # signal.alarm(5)
                     # try:
-                        if self.STM_connection is None:
-                            print('[STM-CONN] STM is not connected. Trying to connect...')
-                            self.connect_STM()
+                        # if self.STM_connection is None:
+                        #     print('[STM-CONN] STM is not connected. Trying to connect...')
+                        #     self.connect_STM()
                         
-                            raw_dat = self.STM_connection.read(1)
+                        raw_dat = self.STM_connection.read(1)
                         print("raw_dat: " + str(raw_dat))
                         dat = raw_dat.strip().decode()
                         if dat == 'R':
