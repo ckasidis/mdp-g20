@@ -266,12 +266,12 @@ class MultiProcess:
                         else: # object found
                             cls_id = self.reply
                             if len(self.obslst)>0:
-                                msg_to_send_AND = 'AND|OBS-'+str(self.obslst[0])+'-'+str(cls_id)
+                                msg_to_send_AND = str(self.obslst[0])+'-'+str(cls_id)
                                 self.obslst.pop(0)
-                            print("msg_to_send_AND: " , msg_to_send_AND)
-                            self.AND.write_to_AND(msg_to_send_AND)
+                                print("msg_to_send_AND: " , msg_to_send_AND)
+                                self.AND.write_to_AND(msg_to_send_AND)
                             # self.message_queue.put_nowait(self._format_for('AND', msg_to_send_AND.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
+                                print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + msg_to_send_AND)
 
                         # time.sleep(2)
 
