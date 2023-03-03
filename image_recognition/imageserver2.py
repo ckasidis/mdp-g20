@@ -39,9 +39,9 @@ while True:
         confidence = info[0]['confidence']
             
         if confidence > 0.05: 
-            encoded_name = str(name).encode()    
+            # encoded_name = str(name).encode()    
             print("Object found, details are as follows:\nClass ID :\t{}\nConfidence :\t{}".format(name, confidence))
-            imageHub.send_reply(encoded_name)
+            imageHub.send_reply(str(name).encode())
             print("[IMGREC] Class ID {} sent to Raspberry Pi".format(name))
             # results.render()
             results.save()
