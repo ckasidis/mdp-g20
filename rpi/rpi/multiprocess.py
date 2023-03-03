@@ -197,7 +197,9 @@ class MultiProcess:
                     self.AND.write_to_AND(message)
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-WRITE-AND ERROR] %s' % str(e))
-                break
+                time.sleep(0.5)
+                
+                # break
 
     def _write_target(self):
         while True:
@@ -231,7 +233,7 @@ class MultiProcess:
                 elif target == 'ALG':
                     self.dropped_connection.value = 0
 
-                break
+                time.sleep(0.5)
 
     def _take_pic(self):
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server

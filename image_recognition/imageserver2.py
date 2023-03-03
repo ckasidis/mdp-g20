@@ -50,12 +50,12 @@ while True:
         else:
             imageHub.send_reply(b'n')
             # results.render()
-            results.show()
+            # results.show()
             results.save()
 
     else:
         imageHub.send_reply(b'n') # no object found
         # results.render()
-        results.show()
+        # results.show()
         results.save()
 
