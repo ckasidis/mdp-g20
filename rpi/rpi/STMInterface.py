@@ -9,11 +9,11 @@ BAUD_RATE = 115200
 
 init(autoreset=True)
 
-# class TimeoutException(Exception):   # Custom exception class
-#     pass
+class TimeoutException(Exception):   # Custom exception class
+    pass
 
-# def timeout_handler(signum, frame):   # Custom signal handler
-#     raise TimeoutException
+def timeout_handler(signum, frame):   # Custom signal handler
+    raise TimeoutException
 
 import time
 import signal
