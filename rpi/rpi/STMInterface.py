@@ -90,9 +90,8 @@ class STM:
             print('In STM: write to STM method: after Transmitted to STM')
             signal.signal(signal.SIGALRM, timeout_handler)
             while True:
-                try:
+                # try:
                     # Change the behavior of SIGALRM
-                    
                     signal.alarm(5)
                     try:
                         if self.STM_connection is None:
@@ -110,12 +109,12 @@ class STM:
                     else:
                         # Reset the alarm
                         signal.alarm(0)
-                except Exception as e:
-                    print("error caught in write_to_STM....trying again")
-                    time.sleep(0.5)
-                    continue
+                # except Exception as e:
+                #     print("error caught in write_to_STM....trying again")
+                #     time.sleep(0.5)
+                #     continue
         except Exception as e:
-            print('[STM-WRITE Error] %s' % str(e))
+            print('[STM-WRITE Error] write_to_STM() function %s' % str(e))
             #raise e
 
 if __name__ == '__main__':
