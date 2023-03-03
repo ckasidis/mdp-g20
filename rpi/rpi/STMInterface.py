@@ -99,7 +99,7 @@ class STM:
         
             #raise e
 
-    @break_after(5)
+    # @break_after(5)
     def write_to_STM(self, message):
         try:
             if self.STM_connection is None:
