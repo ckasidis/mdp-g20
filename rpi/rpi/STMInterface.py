@@ -5,7 +5,7 @@ from colorama import *
 # import signal
 
 SERIAL_PORT = '/dev/ttyUSB0'
-BAUD_RATE = 115200
+BAUD_RATE = 9600
 
 init(autoreset=True)
 
