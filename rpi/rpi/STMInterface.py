@@ -88,10 +88,11 @@ class STM:
             self.STM_connection.write(message.encode())
             print(message +" sent")
             print('In STM: write to STM method: after Transmitted to STM')
+            signal.signal(signal.SIGALRM, timeout_handler)
             while True:
                 try:
                     # Change the behavior of SIGALRM
-                    signal.signal(signal.SIGALRM, timeout_handler)
+                    
                     signal.alarm(5)
                     try:
                         if self.STM_connection is None:
