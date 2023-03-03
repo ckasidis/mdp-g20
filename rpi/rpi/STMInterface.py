@@ -71,6 +71,7 @@ class STM:
                 self.connect_STM()
             print('In STM: write to STM method: before Transmitted to STM:')
             print('\t %s' % message)
+            st = time.time()
             self.STM_connection.write(message.encode())
             print(message +" sent")
             print('In STM: write to STM method: after Transmitted to STM')
@@ -79,6 +80,8 @@ class STM:
                     print('[STM-CONN] STM is not connected. Trying to connect...')
                     self.connect_STM()
                 raw_dat = self.STM_connection.read(1)
+                if time.time()-st > 5:
+                    break
                 print("raw_dat: " + str(raw_dat))
                 dat = raw_dat.strip().decode()
                 if dat == 'R':
