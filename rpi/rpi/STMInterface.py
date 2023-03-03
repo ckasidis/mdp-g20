@@ -2,10 +2,20 @@ import serial
 import time
 from colorama import *
 
+import signal
+
 SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 
 init(autoreset=True)
+
+class TimeoutException(Exception):   # Custom exception class
+    pass
+
+def timeout_handler(signum, frame):   # Custom signal handler
+    raise TimeoutException
+
+
 
 class STM:
     def __init__(self):
@@ -80,18 +90,25 @@ class STM:
             print('In STM: write to STM method: after Transmitted to STM')
             while True:
                 try:
-                    if self.STM_connection is None:
-                        print('[STM-CONN] STM is not connected. Trying to connect...')
-                        self.connect_STM()
-                    
-                        raw_dat = self.STM_connection.read(1)
-                    if time.time()-st > 5:
-                        break
-                    print("raw_dat: " + str(raw_dat))
-                    dat = raw_dat.strip().decode()
-                    if dat == 'R':
-                        print("received R reply from STM")
-                        break
+                    # Change the behavior of SIGALRM
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(5)
+                    try:
+                        if self.STM_connection is None:
+                            print('[STM-CONN] STM is not connected. Trying to connect...')
+                            self.connect_STM()
+                        
+                            raw_dat = self.STM_connection.read(1)
+                        print("raw_dat: " + str(raw_dat))
+                        dat = raw_dat.strip().decode()
+                        if dat == 'R':
+                            print("received R reply from STM")
+                            break
+                    except TimeoutException:
+                        break # continue the for loop if function A takes more than 5 second
+                    else:
+                        # Reset the alarm
+                        signal.alarm(0)
                 except Exception as e:
                     print("error caught in write_to_STM....trying again")
                     time.sleep(0.5)
