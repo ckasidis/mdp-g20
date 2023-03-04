@@ -248,7 +248,7 @@ class MultiProcess:
                         self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                         self.rawCapture = PiRGBArray(self.camera)
 
-                        self.camera.capture(self.rawCapture, format="rgb")
+                        self.camera.capture(self.rawCapture, format="bgr")
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
 
