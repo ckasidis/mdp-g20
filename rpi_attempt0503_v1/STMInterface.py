@@ -49,6 +49,7 @@ class STM:
         print("Reading")
         try:
             self.STM_connection.flush()
+            
             get_message = self.STM_connection.read(9)
             print(get_message)            
 

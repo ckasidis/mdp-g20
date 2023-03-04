@@ -167,6 +167,7 @@ class MultiProcess:
         print("In STM Read Func")
         while True:
             try:
+
                 message = self.STM.STM_connection.read(1)
                 message = message.strip().decode() 
                 print(Fore.LIGHTCYAN_EX + '[_read_STM] Message recvd and decoded as',str(message)) 
@@ -212,15 +213,15 @@ class MultiProcess:
 #                         print(len(steps))
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
-                        time.sleep(3)
-                        message = self.STM.read_from_STM()
-                        if message is None:
-                                continue
-                        message = message.strip().decode() 
-                        print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
-                        if 'R' in message: 
-                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
-                            continue
+                        # time.sleep(3)
+                        # message = self.STM.read_from_STM()
+                        # if message is None:
+                        #         continue
+                        # message = message.strip().decode() 
+                        # print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
+                        # if 'R' in message: 
+                        #     print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
+                        #     continue
                     elif target == 'AND_PATH' or target == 'AND':
                         time.sleep(1)
                         self.AND.write_to_AND(payload)
