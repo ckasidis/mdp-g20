@@ -26,7 +26,7 @@ class MultiProcess:
         self.STM = STM()
         self.obslst = []
         self.manager = Manager()
-
+        self.lock = False
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
     
@@ -154,7 +154,9 @@ class MultiProcess:
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
-
+                            while True:
+                                if self.lock:
+                                    break
                 break # added the break statement to avoid infinite 'none' loop
 
             except Exception as e:
@@ -213,14 +215,14 @@ class MultiProcess:
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
                         time.sleep(3)
-                        # message = self.STM.read_from_STM()
-                        # if message is None:
-                        #         continue
-                        # message = message.strip().decode() 
-                        # print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
-                        # if 'R' in message: 
-                        #     print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
-                        #     continue
+                        message = self.STM.read_from_STM()
+                        if message is None:
+                                continue
+                        message = message.strip().decode() 
+                        print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
+                        if 'R' in message: 
+                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
+                            continue
                     elif target == 'AND_PATH' or target == 'AND':
                         time.sleep(1)
                         self.AND.write_to_AND(payload)
