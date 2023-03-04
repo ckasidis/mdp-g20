@@ -155,7 +155,7 @@ class MultiProcess:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
-                                if self.lock:
+                                if self.lock==True:
                                     break
                 break # added the break statement to avoid infinite 'none' loop
 
@@ -174,7 +174,7 @@ class MultiProcess:
                 if 'R' in message: 
                     print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
                     # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
-                self.lock=True
+                    self.lock=True
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
                 break
