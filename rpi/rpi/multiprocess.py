@@ -39,7 +39,7 @@ class MultiProcess:
         self.write_process = Process(target=self._write_target)
         print(Fore.LIGHTGREEN_EX + '[MultiProcess] MultiProcessing initialized')
 
-        self.dropped_connection = Value('i', 0)
+        self.dropped_connection = Value('i', 1)
 
         self.sender = None
 
@@ -169,7 +169,9 @@ class MultiProcess:
                 for msg in message_list:
                     if len(msg) != 0:
                         messages = msg.split('|', 1)
-
+                        if 'R' in messages:
+                            print('recvd R')
+                            self.cnt=True
                         if messages[0] == 'AND':
                             print(Fore.LIGHTRED_EX + 'STM > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.to_AND_message_queue.put_nowait(messages[1].encode())

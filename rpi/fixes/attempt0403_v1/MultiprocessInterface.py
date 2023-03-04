@@ -30,7 +30,7 @@ class MultiProcess:
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
     
-        
+        self.obslst = []
         self.read_AND_process = Process(target=self._read_AND)
         self.read_ALG_process = Process(target=self._read_ALG)
         self.read_STM_process = Process(target=self._read_STM)
@@ -116,11 +116,17 @@ class MultiProcess:
     def _read_ALG(self):
         while True:
             try:
+                print("Read Command Message from ALGO")
                 message = self.ALG.read_from_ALG()
-                print(message)
+                print("Message before split ",message)
                 if message is None:
                     continue
-                message_list = message.splitlines()
+                messages = message.split('$',1)
+                message_list = messages[0].split(",")
+                print("Command Msg List : ", message_list)
+                self.obslst = messages[1].split(",")
+                print("Obst Msg List : ", self.obslst)
+
                 for msg in message_list:
                     if len(msg) != 0:
 
@@ -160,7 +166,6 @@ class MultiProcess:
                 message_list = message.decode().splitlines()
                 for msg in message_list:
                     if len(msg) != 0:
-#                         print("msg receive from stm: "+msg)
                         messages = msg.split('|', 1)
 
                         if messages[0] == 'AND':

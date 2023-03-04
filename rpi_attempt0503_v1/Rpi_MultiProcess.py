@@ -24,7 +24,7 @@ class MultiProcess:
         self.AND = Android()
         self.ALG = Algo()
         self.STM = STM()
-
+        self.obslst = []
         self.manager = Manager()
 
         self.to_AND_message_queue = self.manager.Queue()
@@ -34,6 +34,7 @@ class MultiProcess:
         self.read_AND_process = Process(target=self._read_AND)
         self.read_ALG_process = Process(target=self._read_ALG)
         self.read_STM_process = Process(target=self._read_STM)
+
 
         self.write_AND_process = Process(target=self._write_AND)
         self.write_process = Process(target=self._write_target)
@@ -45,7 +46,6 @@ class MultiProcess:
 
         self.image_queue = self.manager.Queue()
         self.image_process = Process(target = self._take_pic)
-        
         
         self.processes = []
         self.processes.append(self.read_AND_process)
@@ -105,6 +105,12 @@ class MultiProcess:
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
                             print('queued')
+                        elif messages[0] == 'RPI_END':
+                            print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
+                            # assert isinstance(messages, object)
+                            # self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
+                            # print('queued')
+                            sys.exit()
                         else:
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
@@ -117,10 +123,15 @@ class MultiProcess:
         while True:
             try:
                 message = self.ALG.read_from_ALG()
-                print(message)
+                print("[_read_ALG] Message recvd as is", message)
                 if message is None:
                     continue
-                message_list = message.splitlines()
+                messages = message.split('$',1) # to split commands and obstacle list
+                message_list = messages[0].split(",")
+                print("[_read_ALG] Command Msg List : ", message_list)
+                self.obslst = messages[1].split(",")
+                print("[_read_ALG] Obstacle Traversal Order : ", self.obslst)
+
                 for msg in message_list:
                     if len(msg) != 0:
 
@@ -153,30 +164,13 @@ class MultiProcess:
         while True:
             try:
                 message = self.STM.read_from_STM()
-
                 if message is None:
-                    continue
-                print(Fore.LIGHTCYAN_EX + "STM Message received " + message.decode())
-                message_list = message.decode().splitlines()
-                for msg in message_list:
-                    if len(msg) != 0:
-#                         print("msg receive from stm: "+msg)
-                        messages = msg.split('|', 1)
-
-                        if messages[0] == 'AND':
-                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.to_AND_message_queue.put_nowait(messages[1].encode())
-                            
-                        elif messages[0] == 'ALG':
-                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
-                        
-                        elif str(messages[0]) == "\x00K":
-                            messages[0] = 'K'
-                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(messages[0])))
-                            self.message_queue.put_nowait(self._format_for('ALG', ('K\n').encode()))
-                        else:
-                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(messages))
+                        continue
+                message = message.strip().decode() 
+                print(Fore.LIGHTCYAN_EX + '[_read_STM] Message recvd and decoded as',str(message)) 
+                if 'R' in message: 
+                    print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
+                    self.message_queue.put_nowait(self._format_for('ALG', 'R'))
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
@@ -203,7 +197,6 @@ class MultiProcess:
                     print(payload)
                     if target == 'ALG':
                         self.ALG.write_to_ALG(payload)
-                        
                         print('once')
                         print('sending to algo')
                         time.sleep(0.5)
@@ -262,12 +255,14 @@ class MultiProcess:
                             
                         else:
 #                             #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
-                            self.reply += '\n'
-                            print(self.reply)
-                            self.message_queue.put_nowait(self._format_for('ALG',self.reply.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+                            message_obst = self.obslst[0]+self.reply
+                            self.obslst.pop(0)
+                            print(message_obst)
+                            self.message_queue.put_nowait(self._format_for('ALG',message_obst.encode()))
+                            print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + message_obst)
 
                         self.camera.close()
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
+
