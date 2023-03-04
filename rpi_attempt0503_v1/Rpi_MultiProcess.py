@@ -103,7 +103,7 @@ class MultiProcess:
                         if messages[0] == 'ALG' or messages[0] == 'ALGO':
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             assert isinstance(messages, object)
-                            self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
+                            self.message_queue.put_nowait(self._format_for('ALG', (messages[1]).encode()))
                             print('queued')
                         elif messages[0] == 'RPI_END':
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
@@ -154,6 +154,8 @@ class MultiProcess:
                         else:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
+
+                break # added the break statement to avoid infinite 'none' loop
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
@@ -210,6 +212,14 @@ class MultiProcess:
 #                         print(len(steps))
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
+                        message = self.STM.read_from_STM()
+                        if message is None:
+                                continue
+                        message = message.strip().decode() 
+                        print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
+                        if 'R' in message: 
+                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
+                            continue
                     elif target == 'AND_PATH' or target == 'AND':
                         time.sleep(1)
                         self.AND.write_to_AND(payload)
