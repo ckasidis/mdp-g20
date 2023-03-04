@@ -212,14 +212,15 @@ class MultiProcess:
 #                         print(len(steps))
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
-                        message = self.STM.read_from_STM()
-                        if message is None:
-                                continue
-                        message = message.strip().decode() 
-                        print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
-                        if 'R' in message: 
-                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
-                            continue
+                        time.sleep(3)
+                        # message = self.STM.read_from_STM()
+                        # if message is None:
+                        #         continue
+                        # message = message.strip().decode() 
+                        # print(Fore.LIGHTCYAN_EX + '[_write_target()] Message recvd and decoded as',str(message)) 
+                        # if 'R' in message: 
+                        #     print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
+                        #     continue
                     elif target == 'AND_PATH' or target == 'AND':
                         time.sleep(1)
                         self.AND.write_to_AND(payload)
@@ -269,11 +270,13 @@ class MultiProcess:
                             
                         else:
 #                             #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
-                            message_obst = self.obslst[0]+self.reply
-                            self.obslst.pop(0)
-                            print(message_obst)
-                            self.message_queue.put_nowait(self._format_for('ALG',message_obst.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + message_obst)
+                            print(self.obslst)
+                            if len(self.obslst)>0:
+                                message_obst = self.obslst[0]+self.reply
+                                self.obslst.pop(0)
+                                print(message_obst)
+                                self.message_queue.put_nowait(self._format_for('ALG',message_obst.encode()))
+                                print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + message_obst)
 
                 
                 except Exception as e:
