@@ -9,12 +9,6 @@ BAUD_RATE = 115200
 
 init(autoreset=True)
 
-class TimeoutException(Exception):   # Custom exception class
-    pass
-
-def timeout_handler(signum, frame):   # Custom signal handler
-    raise TimeoutException
-
 import time
 import signal
 
@@ -127,18 +121,19 @@ class STM:
                 try:
                     # Change the behavior of SIGALRM
                     # signal.alarm(5)
-                    # try:
-                        # if self.STM_connection is None:
-                        #     print('[STM-CONN] STM is not connected. Trying to connect...')
-                        #     self.connect_STM()
-                    if read_rawdat_function():
-                        break
-                        # raw_dat = self.STM_connection.read(1)
-                        # print("raw_dat: " + str(raw_dat))
-                        # dat = raw_dat.strip().decode()
-                        # if dat == 'R':
-                        #     print("received R reply from STM")
-                        #     break
+                    try:
+                        if self.STM_connection is None:
+                            print('[STM-CONN] STM is not connected. Trying to connect...')
+                            self.connect_STM()
+                    # if read_rawdat_function():
+                    #     break
+                        time.sleep(0.1) # add time.sleep
+                        raw_dat = self.STM_connection.read(1)
+                        print("raw_dat: " + str(raw_dat))
+                        dat = raw_dat.strip().decode()
+                        if dat == 'R':
+                            print("received R reply from STM")
+                            break
                     # except TimeoutException:
                     #     break # continue the for loop if function A takes more than 5 second
                     # else:
