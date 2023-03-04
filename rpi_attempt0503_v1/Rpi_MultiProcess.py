@@ -100,7 +100,7 @@ class MultiProcess:
 
                         messages = msg.split('|', 1)
 
-                        if messages[0] == 'ALG':
+                        if messages[0] == 'ALG' or messages[0] == 'ALGO':
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
