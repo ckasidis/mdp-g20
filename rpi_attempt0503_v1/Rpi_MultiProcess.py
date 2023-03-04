@@ -252,6 +252,10 @@ class MultiProcess:
                         self.image = self.rawCapture.array
                         self.rawCapture.truncate(0)
 
+                        # adding the stop preview and close above to avoid OutofResources MMAL error
+                        self.camera.stop_preview()
+                        self.camera.close()
+
                         #Reply received from the Image Processing Server
                         self.reply = self.sender.send_image(self.rpi_name, self.image)
                         self.reply = str(self.reply.decode())
@@ -271,7 +275,6 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for('ALG',message_obst.encode()))
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + message_obst)
 
-                        self.camera.close()
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
