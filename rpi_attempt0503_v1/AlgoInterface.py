@@ -96,11 +96,14 @@ class Algo:
 
     def write_to_ALG(self, message):
         try:
-            self.client.send(message.encode())
+            self.client.send(message.encode()ß)
 
         except Exception as e:
-            print(Fore.RED + '[ALG-WRITE ERROR] %s' % str(e))
-            raise e
+            try:
+                self.client.send(message)
+            except Exception as e:
+                print(Fore.RED + '[ALG-WRITE ERROR] %s' % str(e))
+                raise e
 
 
 if __name__ == '__main__':
