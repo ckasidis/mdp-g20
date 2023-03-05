@@ -11,7 +11,7 @@ from picamera import PiCamera
 import socket
 import cv2
 import imagezmq
-
+import signal
 
 from picamera.array import PiRGBArray
 
@@ -164,6 +164,24 @@ class MultiProcess:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 
+    def break_after(seconds=2):
+        def timeout_handler(signum, frame):   # Custom signal handler
+            raise TimeoutException
+        def function(function):
+            def wrapper(*args, **kwargs):
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(seconds)
+                try:
+                    res = function(*args, **kwargs)
+                    signal.alarm(0)      # Clear alarm
+                    return res
+                except TimeoutException:
+                    print (f'Oops, timeout: %s sec reached.' % seconds, function.__name__, args, kwargs)
+                return
+            return wrapper
+        return function
+
+    @break_after(5)
     def _read_STM(self):
         print("In STM Read Func")
         # while True:
