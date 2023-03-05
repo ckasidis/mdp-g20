@@ -19,6 +19,10 @@ init(autoreset=True)
 #print(sys.version)
 #print(sys.path)
 
+class TimeoutException(Exception):   # Custom exception class
+    pass
+
+
 class MultiProcess:
     def __init__(self):
         self.AND = Android()
