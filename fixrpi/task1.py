@@ -172,10 +172,10 @@ if __name__ == '__main__':
 			# Process the message
 			content = msg[idx+1:]
 			if command == "ALGO|" : #Path planning to STM
-				interfaces[STM].write(content)
+				interfaces[ALGOPC].write(content)
 				#time.sleep(5) #need to adjust 
 				readSTM(content)
-				print(f"[FORM STM]: finish executing {content}")
+				print(f"[FROM STM]: finish executing {content}")
 
 			elif command == "ALGO|" : #Android to path planning
 				interfaces[ALGOPC].write(content)
