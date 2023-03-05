@@ -193,7 +193,8 @@ class MultiProcess:
                 if 'R' or '\x00' in message: 
                     print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', message))
                 # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
-                    self.lock=True
+                self.lock=True
+                break
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
