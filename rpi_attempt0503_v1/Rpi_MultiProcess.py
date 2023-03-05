@@ -205,7 +205,7 @@ class MultiProcess:
                     message = self.STM.STM_connection.read(1)
                     message = message.strip().decode() 
                     print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
-                    if 'R' in message: 
+                    if 'R' or '\x00' in message: 
                         print(Fore.LIGHTRED_EX + '\nSTM sent the ack R in the message %s' % (message))
                     # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
                     self.lock=True
