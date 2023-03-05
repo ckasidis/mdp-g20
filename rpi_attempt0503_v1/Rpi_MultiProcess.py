@@ -188,23 +188,24 @@ class MultiProcess:
     def _read_STM(self):
         print("In STM Read Func")
         while True:
-            retry = True
+            # retry = True
             try:
-                if retry:
-                    with self.lock:
-                        message = self.STM.STM_connection.read(1).strip().decode() 
-                        # message = message.strip().decode() 
-                        print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
-                        if 'R' or '\x00' or '' in message: 
-                            print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', message))
+                # if retry:
+                    self.lock.acquire()
+                    message = self.STM.STM_connection.read(1).strip().decode() 
+                    # message = message.strip().decode() 
+                    print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
+                    if 'R' or '\x00' or '' in message: 
+                        print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', message))
+                        self.lock.release()
                         # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
                     # self.lock.release()
-                    break
+                    # break
 
             except Exception as e:
-                if retry:
-                    continue
-                    retry=False
+                # if retry:
+                #     continue
+                    # retry=False
                 else:
                     print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
                     break
