@@ -4,7 +4,7 @@
 
 import time
 import bluetooth
-
+import os
 class Android(object):
 
 	# Initialise the connection with the Android tablet
@@ -18,7 +18,7 @@ class Android(object):
 
 		self.server = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 		#self.server.setsockopt(bluetooth.BluetoothSocket.SOL_SOCKET,bluetooth. BluetoothSocket.SO_REUSEADDR, 1)
-
+		os.system('sudo hciconfig hci0 piscan')
 		self.server.bind(("", RFCOMM_channel))
 		self.server.listen(RFCOMM_channel)
 		#self.server.listen(2)
