@@ -185,31 +185,32 @@ class MultiProcess:
                 print("[_read_ALG] Message recvd as is", message)
                 if message is None:
                     continue
-                messages = message.split('$',1) # to split commands and obstacle list
-                self.obslst = messages[0].split(",")
+                if "$" in message:
+                    messages = message.split('$',1) # to split commands and obstacle list
+                    self.obslst = messages[0].split(",")
+                else:
+                    # message = self.ALG.read_from_ALG()
+                    message_list = message.splitlines()
+                    print("\n[_read_ALG] Command Msg List : ", message_list)
+                    self.commands = message_list
+                    print("\n[_read_ALG] Obstacle Traversal Order : ", self.obslst)
 
-                message = self.ALG.read_from_ALG()
-                message_list = message.splitlines()
-                print("\n[_read_ALG] Command Msg List : ", message_list)
-                self.commands = message_list
-                print("\n[_read_ALG] Obstacle Traversal Order : ", self.obslst)
+                    for msg in message_list:
+                        if len(msg) != 0:
 
-                for msg in message_list:
-                    if len(msg) != 0:
+                            messages = msg.split('|', 1)
 
-                        messages = msg.split('|', 1)
-
-                        # Message format for Image Rec: RPI|
-                        if messages[0] == 'RPI':
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
-                            self.image_queue.put_nowait('take')
-                        elif messages[0] == 'RPI_END': # end keyword
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
-                            print("RPI ENDING NOW...")
-                            sys.exit()
-                        else: # STM 
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
+                            # Message format for Image Rec: RPI|
+                            if messages[0] == 'RPI':
+                                print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
+                                self.image_queue.put_nowait('take')
+                            elif messages[0] == 'RPI_END': # end keyword
+                                print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
+                                print("RPI ENDING NOW...")
+                                sys.exit()
+                            else: # STM 
+                                print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                                self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
@@ -346,8 +347,8 @@ class MultiProcess:
                                 message_obst = self.obslst[0]+self.reply
                                 self.obslst.pop(0)
                                 print(message_obst)
-                                self.message_queue.put_nowait(self._format_for('ALG',message_obst.encode()))
-                                print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + message_obst)
+                                self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
+                                print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
 
                 
                 except Exception as e:
