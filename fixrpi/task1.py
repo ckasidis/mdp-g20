@@ -175,7 +175,7 @@ if __name__ == '__main__':
 			content = msg[idx+1:]
 			if command == "STM|" : #Path planning to STM
 				interfaces[STM].write(content)
-				#time.sleep(5) #need to adjust 
+				time.sleep(3.5) # need to adjust 
 				readSTM(content)
 				print(f"[FROM STM]: finish executing {content}")
 
