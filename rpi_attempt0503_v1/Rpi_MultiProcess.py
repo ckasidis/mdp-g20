@@ -63,6 +63,8 @@ class MultiProcess:
 
         self.sender = None
 
+        self.start = False
+
         self.image_queue = self.manager.Queue()
         self.image_process = Process(target = self._take_pic)
         
@@ -182,6 +184,7 @@ class MultiProcess:
 
     def _read_ALG(self):
         while True:
+            self.lock.acquire()
             try:
                 message = self.ALG.read_from_ALG()
                 print("[_read_ALG] Message recvd as is", message)
@@ -205,7 +208,6 @@ class MultiProcess:
 
                             # Message format for Image Rec: RPI|
                             if messages[0] == 'RPI':
-                                self.lock.acquire()
                                 try:
                                     print('\nlock acquired to take new pic\n')
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
@@ -213,21 +215,20 @@ class MultiProcess:
                                     time.sleep(0.5)
                                 finally:
                                     self.lock.release()
-                                    print('\nlock released after taking pic\n')
+
                             elif messages[0] == 'RPI_END': # end keyword
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                                 print("RPI ENDING NOW...")
                                 sys.exit()
-                            else: # STM 
-                                        self.lock.acquire()
-                                        try:
-                                            print('\nlock acquired to send new command\n')
-                                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                                            self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
-                                            time.sleep(0.5)
-                                        finally:
-                                            self.lock.release()
-                                            print('\nlock released after sending new command\n')
+                            else: # STM
+                                try:
+                                    print('\nlock acquired to send new command\n')
+                                    print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                                    self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                    time.sleep(0.5)
+                                finally:
+                                    self.lock.release()
+
 
 
             except Exception as e:
