@@ -211,9 +211,13 @@ class MultiProcess:
                                 sys.exit()
                             else: # STM 
                                 while True:
-                                    if self.lock.acquire():
-                                        print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                                        self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                        self.lock.acquire()
+                                        try:
+                                            print('\nlock acquired to send new command')
+                                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                                            self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                        finally:
+                                            self.lock.release()
                                         break
 
 
@@ -269,6 +273,7 @@ class MultiProcess:
                 if len(message) != 0:
                     if 'R' in message or "\x00" in message:
                         self.lock.acquire()
+                        print('lock acquired')
                         try:
                             print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
                             self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
@@ -276,6 +281,7 @@ class MultiProcess:
                             # time.sleep(1.5)
                         finally:
                            self.lock.release() 
+                           print('lock released')
                     else:
                         continue
                 # print("slowing down for 3 seconds")
