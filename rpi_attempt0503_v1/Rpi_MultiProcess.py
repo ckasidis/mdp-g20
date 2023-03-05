@@ -351,40 +351,43 @@ class MultiProcess:
             while True:
                 try:
                     if not self.image_queue.empty():
-                        test = self.image_queue.get_nowait()
-                        self.rpi_name = socket.gethostname()
-                        self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
-                        self.rawCapture = PiRGBArray(self.camera)
+                        self.lock.acquire()
+                        try:
+                            test = self.image_queue.get_nowait()
+                            self.rpi_name = socket.gethostname()
+                            self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
+                            self.rawCapture = PiRGBArray(self.camera)
 
-                        self.camera.capture(self.rawCapture, format="bgr")
-                        self.image = self.rawCapture.array
-                        self.rawCapture.truncate(0)
+                            self.camera.capture(self.rawCapture, format="bgr")
+                            self.image = self.rawCapture.array
+                            self.rawCapture.truncate(0)
 
-                        # adding the stop preview and close above to avoid OutofResources MMAL error
-                        self.camera.stop_preview()
-                        self.camera.close()
+                            # adding the stop preview and close above to avoid OutofResources MMAL error
+                            self.camera.stop_preview()
+                            self.camera.close()
 
-                        #Reply received from the Image Processing Server
-                        self.reply = self.sender.send_image(self.rpi_name, self.image)
-                        self.reply = str(self.reply.decode())
-                        print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
+                            #Reply received from the Image Processing Server
+                            self.reply = self.sender.send_image(self.rpi_name, self.image)
+                            self.reply = str(self.reply.decode())
+                            print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
 
-                        # #Messages sent to ALG & AND')
-                        # if self.reply == 'n':
-                        #     self.reply = 'n'
-                        #     self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
-                        #     print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
-                            
-                        # else:
-                        #     #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
-                        print(self.obslst)
-                        if len(self.obslst)>0:
-                            message_obst = self.obslst[0]+self.reply
-                            self.obslst.pop(0)
-                            print(message_obst)
-                            self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
-
+                            # #Messages sent to ALG & AND')
+                            # if self.reply == 'n':
+                            #     self.reply = 'n'
+                            #     self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
+                            #     print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+                                
+                            # else:
+                            #     #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
+                            print(self.obslst)
+                            if len(self.obslst)>0:
+                                message_obst = self.obslst[0]+self.reply
+                                self.obslst.pop(0)
+                                print(message_obst)
+                                self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
+                                print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
+                        finally:
+                            self.lock.release()
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
