@@ -275,6 +275,40 @@ class MultiProcess:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
                 break
  
+    def _read_STM_base(self):
+        print("In STM Read Func")
+        while True:
+            try:
+                message = self.STM.read_from_STM()
+
+                if message is None:
+                    continue
+                print(Fore.LIGHTCYAN_EX + "STM Message received " + message.decode())
+                message_list = message.decode().splitlines()
+                for msg in message_list:
+                    if len(msg) != 0:
+                        # print("msg receive from stm: "+msg)
+                        messages = msg.split('|', 1)
+
+                        if messages[0] == 'AND':
+                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % (str(messages[0]), str(messages[1])))
+                            self.to_AND_message_queue.put_nowait(messages[1].encode())
+                            
+                        elif messages[0] == 'ALG':
+                            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % (str(messages[0]), str(messages[1])))
+                            self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
+                        
+                        elif str(messages[0]) == "\x00K":
+                            messages[0] = 'K'
+                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(messages[0])))
+                            self.message_queue.put_nowait(self._format_for('ALG', ('K\n').encode()))
+                        else:
+                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(messages))
+
+            except Exception as e:
+                print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
+                break
+
     def _write_AND(self):
         while True:
             try:
