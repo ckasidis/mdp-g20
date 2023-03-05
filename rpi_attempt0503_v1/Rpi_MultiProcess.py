@@ -16,8 +16,6 @@ import signal
 from picamera.array import PiRGBArray
 
 init(autoreset=True)
-#print(sys.version)
-#print(sys.path)
 
 class TimeoutException(Exception):   # Custom exception class
     pass
@@ -57,7 +55,6 @@ class MultiProcess:
         self.processes.append(self.read_STM_process)
         self.processes.append(self.write_AND_process)
         self.processes.append(self.write_process)
-
 
     def start(self):
         try:
@@ -160,15 +157,15 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
                                 self._read_STM()
-                                # if self.lock:
-                                #     break
+                                if self.lock:
+                                    break
                 break # added the break statement to avoid infinite 'none' loop
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 
-    def break_after(self, seconds=2):
+    def break_after(seconds=2):
         def timeout_handler(signum, frame):   # Custom signal handler
             raise TimeoutException
         def function(function):
@@ -228,12 +225,7 @@ class MultiProcess:
                         time.sleep(0.5)
                     elif target == 'STM':
                         print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
-#                         steps = ""
-#                         for i in range(20):
-#                             steps+= "a"
-#                         for i in len(payload):
-#                             steps[i] = payload[i]
-#                         print(len(steps))
+
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
                         # time.sleep(3)
@@ -286,14 +278,14 @@ class MultiProcess:
                         self.reply = str(self.reply.decode())
                         print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
 
-                        # #Messages sent to ALG & AND')
+                        #Messages sent to ALG & AND')
                         if self.reply == 'n':
                             self.reply = 'n'
                             self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
                             print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
                             
                         else:
-#                             #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
+                            #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
                             print(self.obslst)
                             if len(self.obslst)>0:
                                 message_obst = self.obslst[0]+self.reply
