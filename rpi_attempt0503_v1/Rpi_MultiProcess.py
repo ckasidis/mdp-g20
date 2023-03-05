@@ -49,6 +49,8 @@ class MultiProcess:
         
         self.commands = []
         
+        self.sendnext = False
+
         self.read_AND_process = Process(target=self._read_AND)
         # self.read_ALG_process = Process(target=self._read_ALG, args=(self.lock))
         self.read_ALG_process = Process(target=self._read_ALG)
@@ -63,7 +65,7 @@ class MultiProcess:
 
         self.sender = None
 
-
+        self.sendImg = False
         self.image_queue = self.manager.Queue(maxsize=1)
         self.image_process = Process(target = self._take_pic)
         
@@ -207,18 +209,22 @@ class MultiProcess:
                             # Message format for Image Rec: RPI|
                             if messages[0] == 'RPI':
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
-                                    self.message_queue.put_nowait(self._format_for('STM', 'FW000'.encode()))
+                                    # self.message_queue.put_nowait(self._format_for('STM', 'FW000'.encode()))
+                                    self.sendnext=True
+                                    self.sendImg=True
                                     self.image_queue.put('take')
+
 
                             elif messages[0] == 'RPI_END': # end keyword
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                                 print("RPI ENDING NOW...")
                                 sys.exit()
+
                             else: # STM
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                                self.sendnext=False
                                 self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
                                 time.sleep(0.5)
-
 
 
             except Exception as e:
@@ -246,7 +252,7 @@ class MultiProcess:
 
     def _read_STM(self):
         print("In STM Read Func")
-        while True:
+        while self.sendnext==False:
             try:
                     message = self.STM.STM_connection.read(1).strip().decode() 
 
@@ -257,7 +263,7 @@ class MultiProcess:
                         if 'R' in message or "\x00" in message:
                             print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
                             self.message_queue.put(self._format_for('ALG', ('R').encode()))
-                            
+                            self.sendnext=True
                         else:
                             print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
                             continue        
@@ -293,7 +299,6 @@ class MultiProcess:
                         time.sleep(0.5)
                     elif target == 'STM':
                         print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
-
                         self.STM.write_to_STM(payload)
                         print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
                         # time.sleep(3)
@@ -325,7 +330,7 @@ class MultiProcess:
     def _take_pic(self):
             # Start the Image Rec process
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
-            while True:
+            while self.sendImg:
                 try:
                     if not self.image_queue.empty():
                             test = self.image_queue.get()
