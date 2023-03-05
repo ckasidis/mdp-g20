@@ -170,10 +170,10 @@ class MultiProcess:
         try:
             message = self.STM.STM_connection.read(1)
             message = message.strip().decode() 
-            print(Fore.LIGHTCYAN_EX + '[_read_STM] Message recvd and decoded as',str(message)) 
+            print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as',str(message)) 
             if 'R' in message: 
                 print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
-                self.message_queue.put_nowait(self._format_for('ALG', 'R'))
+            # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
                 self.lock=True
 
         except Exception as e:
