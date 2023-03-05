@@ -185,6 +185,7 @@ class MultiProcess:
     def _read_ALG(self):
         while True:
             self.lock.acquire()
+            print('\nlock acquired to read from ALG\n')
             try:
                 message = self.ALG.read_from_ALG()
                 print("[_read_ALG] Message recvd as is", message)
@@ -258,22 +259,6 @@ class MultiProcess:
         print("In STM Read Func")
         while True:
             try:
-            #     message = self.STM.read_from_STM()
-            #     message_list = message.decode().splitlines()
-            #     for msg in message_list:
-            #         if len(msg) != 0:
-            #             messages = msg.split('|', 1)
-
-            #             if "\x00" or "R" or "" in messages:
-            #                 messages[0] = 'R'
-            #                 print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (R))
-            #                 self.message_queue.put_nowait(self._format_for('ALG', ('R\n').encode()))
-            #             else:
-            #                 print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(messages))
-
-            # except Exception as e:
-            #     print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
-            #     break
                 self.lock.acquire()
                 print('\nlock acquired to send ACK')
                 try:
