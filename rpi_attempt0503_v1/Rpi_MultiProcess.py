@@ -49,8 +49,10 @@ class MultiProcess:
         self.commands = []
         
         self.read_AND_process = Process(target=self._read_AND)
-        self.read_ALG_process = Process(target=self._read_ALG, args=(self.lock))
-        self.read_STM_process = Process(target=self._read_STM, args=(self.lock))
+        # self.read_ALG_process = Process(target=self._read_ALG, args=(self.lock))
+        self.read_ALG_process = Process(target=self._read_ALG)
+        self.read_STM_process = Process(target=self._read_STM,)
+        # self.read_STM_process = Process(target=self._read_STM, args=(self.lock))
 
 
         self.write_AND_process = Process(target=self._write_AND)
@@ -205,13 +207,13 @@ class MultiProcess:
                             if messages[0] == 'RPI':
                                 self.lock.acquire()
                                 try:
-                                    print('lock acquired to take new pic')
+                                    print('\nlock acquired to take new pic\n')
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
                                     self.image_queue.put_nowait('take')
                                     time.sleep(0.5)
                                 finally:
                                     self.lock.release()
-                                    print('lock released after taking pic')
+                                    print('\nlock released after taking pic\n')
                             elif messages[0] == 'RPI_END': # end keyword
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                                 print("RPI ENDING NOW...")
@@ -219,13 +221,13 @@ class MultiProcess:
                             else: # STM 
                                         self.lock.acquire()
                                         try:
-                                            print('\nlock acquired to send new command')
+                                            print('\nlock acquired to send new command\n')
                                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                                             self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
                                             time.sleep(0.5)
                                         finally:
                                             self.lock.release()
-                                            print('lock released after sending new command')
+                                            print('\nlock released after sending new command\n')
 
 
             except Exception as e:
@@ -280,7 +282,7 @@ class MultiProcess:
                 if len(message) != 0:
                     if 'R' in message or "\x00" in message:
                         self.lock.acquire()
-                        print('lock acquired')
+                        print('\nlock acquired to send ACK')
                         try:
                             print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
                             self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
@@ -288,7 +290,7 @@ class MultiProcess:
                             # time.sleep(1.5)
                         finally:
                            self.lock.release() 
-                           print('lock released')
+                           print('\nlock released after sending ACK')
                     else:
                         continue
                 # print("slowing down for 3 seconds")
