@@ -18,10 +18,12 @@ class AlgoPC(object):
 		HOST = '192.168.20.25' # Server IP or Hostname
 		self.PORT = 12345  # Pick an open Port (1000+ recommended), must match the client sport
 		self.sever = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.connect.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		print('Socket created')
         # managing error exception
 		try:
 			self.sever.bind((HOST, self.PORT))
+			self.sever.listen(1)
 		except socket.error:
 			print ('Bind failed ')
 

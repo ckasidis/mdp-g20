@@ -132,7 +132,7 @@ if __name__ == '__main__':
 		interface.connect() # connect STM first, then Android
 
 	android.start() # Starts to receive message from Android 
-	#stm.start()
+	# stm.start()
 	algoPC.start()
 	print("[MAIN] Multiprocess communication started.")
 
@@ -140,25 +140,23 @@ if __name__ == '__main__':
 	# Set up PiCamera
 	print("[MAIN] Setting up PiCamera...")
 	camera = PiCamera()
-	print("[MAIN] PiCamera ready.")
+	print("[SUCCESSFUL CONNECTION] PiCamera ready.")
 
-	# Initialise variables
-	#msg = "PS|BW030"
-	# msg = "PS|FW030,PS|BW040,PS|FL045,PS|BL030,PS|FR090,PS|BR050"
-	# queue.put(msg)
-	#count = 0
+
 	try:
 		while True:
 			# Retrieve messages
 			msg = queue.get()
 			#print(f"msg get from queue: {msg}")
-			if "rpi" in msg:
+			if "RPI" in msg:
 				print("msg")
-				interfaces[ANDROID].write("Meessage received")
+				interfaces[ANDROID].write("Message received")
 				break
 			# Auto Mode
-			if "," in msg and "|" in msg: #Algo command list 
-				algo_commands = msg.split(",")
+			if "," in msg and "|" in msg and '$' in msg: #Algo command list 
+				msg = msg.split('$')
+				obslst = msg[0]
+				algo_commands = msg[1].split(",")
 				for i in algo_commands:
 					queue.put(i)
 					print(f"put in queue {i}")
@@ -173,23 +171,23 @@ if __name__ == '__main__':
 
 			# Process the message
 			content = msg[idx+1:]
-			if command == "PS|" : #Path planning to STM
+			if command == "ALGO|" : #Path planning to STM
 				interfaces[STM].write(content)
 				#time.sleep(5) #need to adjust 
 				readSTM(content)
 				print(f"[FORM STM]: finish executing {content}")
 
-			elif command == "AP|" : #Android to path planning
+			elif command == "ALGO|" : #Android to path planning
 				interfaces[ALGOPC].write(content)
 			elif command == "AR|":
 				if content[:8] == "starting":
 					interfaces[ALGOPC].write(content)
 				elif "reset" in content:
 					interfaces[ALGOPC].write("reset")
-				elif "end" in content:
+				elif "TOCAM" in content:
 					image = takePic()
 					process_image(0, image)
-			elif command == "PR|": #Path planing to RPi
+			elif command == "RPI|": #Path planing to RPi
 				if content[:1] == "S":
 					x = content[1:]
 					interfaces[ANDROID].write(f"Taking picture for obstacle {x}")
@@ -221,9 +219,10 @@ if __name__ == '__main__':
 			i.disconnect()
 		camera.close()
 		android.terminate()
-		#stm.terminate()
+		# stm.terminate()
 		algoPC.terminate()
-		  # Terminate the process
+		
+		# Terminate the process
 		print("[MAIN] Camera closed.")
 		print("[MAIN] Android read message process terminated.")
 
