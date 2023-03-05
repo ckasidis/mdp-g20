@@ -64,11 +64,11 @@ def process_image(x, image):
 			reply = image_sender.send_image(rpi_name, image)
 			reply = reply.decode('utf-8')
 
-			if reply == "-1":  # no image detected
+			if reply == "n":  # no image detected
 				print("[MAIN] No image detected") 
 				id_string_to_android = f"aatarget [{x},99]"
 
-			elif reply == "0": #bulls eye
+			elif reply == "00": #bulls eye
 				id_string_to_android = f"aatarget [{x},{reply}]" 
 				print("[MAIN] Bulls eye detected.")
 

@@ -16,7 +16,7 @@ class AlgoPC(object):
 		self.client = None
 		self.addr = None
 		HOST = '192.168.20.25' # Server IP or Hostname
-		self.PORT = 3004  # Pick an open Port (1000+ recommended), must match the client sport
+		self.PORT = 12345  # Pick an open Port (1000+ recommended), must match the client sport
 		self.sever = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		print('Socket created')
         # managing error exception
