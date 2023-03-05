@@ -245,7 +245,7 @@ class MultiProcess:
                     continue
                 print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
                 if len(message) != 0:
-                    if str(message) =='R':
+                    if str(message) =='R' or str(message)=="\x00":
                         print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
                         self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                     else:
