@@ -188,12 +188,13 @@ class MultiProcess:
                 if "$" in message:
                     messages = message.split('$',1) # to split commands and obstacle list
                     self.obslst = messages[0].split(",")
+                    print("\n[_read_ALG] Obstacle Traversal Order : ", self.obslst)
+
                 else:
                     # message = self.ALG.read_from_ALG()
                     message_list = message.splitlines()
                     print("\n[_read_ALG] Command Msg List : ", message_list)
                     self.commands = message_list
-                    print("\n[_read_ALG] Obstacle Traversal Order : ", self.obslst)
 
                     for msg in message_list:
                         if len(msg) != 0:
