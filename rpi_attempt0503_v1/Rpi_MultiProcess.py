@@ -259,24 +259,9 @@ class MultiProcess:
                     print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
                     if len(message) != 0:
                         if 'R' in message or "\x00" in message:
-                            if (self.ack_count - self.cmd_count == -1):
-                                print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
-                                self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
-                                print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                                # time.sleep(1.5)
-                                self.ack_count+=1
-                                print(f'ack count {self.ack_count}; cmd count {self.ack_count}')
-                            elif self.ack_count>self.cmd_count:
-                                continue
-                            else:
-                                difference = self.cmd_count-self.ack_count
-                                for i in range(difference):
-                                    print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
-                                    self.message_queue.put(self._format_for('ALG', ('R').encode()))
-                                    print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                                    # time.sleep(1.5)
-                                    self.ack_count+=1
-                                    print(f'ack count {self.ack_count}; cmd count {self.ack_count}')
+                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
+                            self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
+                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
                         else:
                             continue        
                 # print("slowing down for 3 seconds")
