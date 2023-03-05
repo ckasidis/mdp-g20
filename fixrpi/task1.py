@@ -66,15 +66,15 @@ def process_image(x, image):
 
 			if reply == "n":  # no image detected
 				print("[MAIN] No image detected") 
-				id_string_to_android = f"aatarget [{x},99]"
+				id_string_to_android = f"n"
 
 			elif reply == "00": #bulls eye
-				id_string_to_android = f"aatarget [{x},{reply}]" 
+				id_string_to_android = f"00" 
 				print("[MAIN] Bulls eye detected.")
 
 			else:
 					image_count += 1
-					id_string_to_android = f"aatarget [{x},{reply}]"
+					id_string_to_android = f"{reply}"
 					# Save the image
 					img_file_name = f'i{image_count}_{reply}.jpg'
 					cv2.imwrite(os.path.join(img_directory, img_file_name), image)                              
@@ -175,7 +175,7 @@ if __name__ == '__main__':
 			content = msg[idx+1:]
 			if command == "STM|" : #Path planning to STM
 				interfaces[STM].write(content)
-				time.sleep(5) # need to adjust 
+				time.sleep(7) # need to adjust 
 				readSTM(content)
 				print(f"[FROM STM]: finish executing {content}")
 
