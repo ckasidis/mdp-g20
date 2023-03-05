@@ -4,7 +4,7 @@
 # ===============================================================
 
 from multiprocessing import Process, Queue   # Manage multi-thread programming
-import time
+import time, signal
 
 from STM32 import STM32
 from Android import Android
