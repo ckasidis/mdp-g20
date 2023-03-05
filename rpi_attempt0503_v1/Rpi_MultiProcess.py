@@ -44,8 +44,8 @@ class MultiProcess:
         self.obslst = []
         self.manager = Manager()
 
-        self.to_AND_message_queue = self.manager.Queue()
-        self.message_queue = self.manager.Queue()
+        self.to_AND_message_queue = self.manager.Queue(maxsize=1)
+        self.message_queue = self.manager.Queue(maxsize=1)
         
         self.commands = []
         
@@ -64,7 +64,7 @@ class MultiProcess:
         self.sender = None
 
 
-        self.image_queue = self.manager.Queue()
+        self.image_queue = self.manager.Queue(maxsize=1)
         self.image_process = Process(target = self._take_pic)
         
         self.processes = []
