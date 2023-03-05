@@ -334,21 +334,21 @@ class MultiProcess:
                         self.reply = str(self.reply.decode())
                         print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
 
-                        #Messages sent to ALG & AND')
-                        if self.reply == 'n':
-                            self.reply = 'n'
-                            self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
-                            print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
+                        # #Messages sent to ALG & AND')
+                        # if self.reply == 'n':
+                        #     self.reply = 'n'
+                        #     self.message_queue.put_nowait(self._format_for('ALG',(self.reply).encode()))
+                        #     print(Fore.LIGHTYELLOW_EX + 'Message send across to ALG: ' + self.reply)
                             
-                        else:
-                            #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
-                            print(self.obslst)
-                            if len(self.obslst)>0:
-                                message_obst = self.obslst[0]+self.reply
-                                self.obslst.pop(0)
-                                print(message_obst)
-                                self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
-                                print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
+                        # else:
+                        #     #msg format to AND: IMG-OBSTACLE_ID-IMG_ID e.g. "IMG-2-31"
+                        print(self.obslst)
+                        if len(self.obslst)>0:
+                            message_obst = self.obslst[0]+self.reply
+                            self.obslst.pop(0)
+                            print(message_obst)
+                            self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
+                            print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
 
                 
                 except Exception as e:
