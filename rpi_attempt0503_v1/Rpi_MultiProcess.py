@@ -174,7 +174,7 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
                                 self._read_STM()
-                                if not self.lock.locked():
+                                if self.lock.acquire():
                                     break
                 break # added the break statement to avoid infinite 'none' loop
 
