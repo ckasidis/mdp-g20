@@ -188,6 +188,7 @@ class MultiProcess:
                     print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
                     self.STM.write_to_STM(message)
                     print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
+                    self.lock=False
                     while True:
                         if self.lock==True:
                             break
