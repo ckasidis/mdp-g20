@@ -9,7 +9,7 @@ import time
 from STM32 import STM32
 from Android import Android
 from AlgoPC import AlgoPC
-from Commands import *
+# from Commands import *
 
 import imagezmq
 import cv2
@@ -21,7 +21,7 @@ import os
 import glob
 import socket
 
-img_directory = "/home/pi/rpi/picamera_images/"
+img_directory = "/home/pi/mdp-g20/fixrpi/picamera_images/"
 image_processing_server_url = "tcp://192.168.20.25:5555"
 image_count = 0 # keep track of the images detected
 
