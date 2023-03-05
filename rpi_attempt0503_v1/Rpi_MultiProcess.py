@@ -49,8 +49,8 @@ class MultiProcess:
         self.commands = []
         
         self.read_AND_process = Process(target=self._read_AND)
-        self.read_ALG_process = Process(target=self._read_ALG)
-        self.read_STM_process = Process(target=self._read_STM)
+        self.read_ALG_process = Process(target=self._read_ALG, args=(self.lock))
+        self.read_STM_process = Process(target=self._read_STM, args=(self.lock))
 
 
         self.write_AND_process = Process(target=self._write_AND)
