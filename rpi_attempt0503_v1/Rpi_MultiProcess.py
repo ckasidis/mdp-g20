@@ -211,10 +211,10 @@ class MultiProcess:
                                 sys.exit()
                             else: # STM 
                                 while True:
-                                    if self.lock==False:
+                                    if self.lock:
                                         print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                                         self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
-                                        self.lock=True
+                                        self.lock=False
                                         break
 
 
@@ -271,7 +271,7 @@ class MultiProcess:
                         print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
                         self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                         print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                        self.lock = False
+                        self.lock = True
                 # print("slowing down for 3 seconds")
                 # time.sleep(3)
             except Exception as e:
