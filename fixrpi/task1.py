@@ -86,6 +86,26 @@ def process_image(x, image):
 	except Exception as e:
 			print(f"[Error] Image processing failed: {str(e)}")
 
+class TimeoutException(Exception):   # Custom exception class
+    pass
+def break_after(seconds=2):
+    def timeout_handler(signum, frame):   # Custom signal handler
+        raise TimeoutException
+    def function(function):
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(seconds)
+            try:
+                res = function(*args, **kwargs)
+                signal.alarm(0)      # Clear alarm
+                return res
+            except TimeoutException:
+                print (f'Oops, timeout: %s sec reached.' % seconds, function.__name__, args, kwargs)
+            return
+        return wrapper
+    return function
+
+@break_after(5)
 def readSTM(command):
 	data = ""
 	while True:
@@ -173,45 +193,23 @@ if __name__ == '__main__':
 
 			# Process the message
 			content = msg[idx+1:]
+
 			if command == "STM|" : #Path planning to STM
 				interfaces[STM].write(content)
-				time.sleep(7) # need to adjust 
+				time.sleep(5) # need to adjust 
 				readSTM(content)
 				print(f"[FROM STM]: finish executing {content}")
 
 			elif command == "ALGO|" : #Android to path planning
 				interfaces[ALGOPC].write(content)
 
-			elif command == "AR|":
-				if content[:8] == "starting":
-					interfaces[ALGOPC].write(content)
-				elif "reset" in content:
-					interfaces[ALGOPC].write("reset")
-				elif "TOCAM" in content:
-					image = takePic()
-					process_image(0, image)
 			elif command == "RPI|": #Path planing to RPi
-				# if content[:1] == "S":
-				x = content[1:]
-				interfaces[ANDROID].write(f"Taking picture for obstacle {x}")
 				image = takePic()
 				result_msg = process_image(x, image)
 				print('obst list',obslst)
 				result_msg = obslst[0]+'-'+result_msg
 				obslst.pop(0)
 				interfaces[ANDROID].write(result_msg)				
-				# elif content[:5] == "start":
-				# 	while True:
-				# 		ans = input("Enter yes to start")
-				# 		if ans == "yes":
-				# 			break
-					# interfaces[ANDROID].write("Start exploring")
-				# elif content[:1] == "O":
-				# 	x = content[1:]
-				# 	interfaces[ANDROID].write(f"Heading to obstacle {x}")
-				# 	print(f"Heading to obstacle at {x}")
-				# else:
-				# 	continue
 
 	except Exception as e:
 		print(f"[ERROR] {str(e)}")
