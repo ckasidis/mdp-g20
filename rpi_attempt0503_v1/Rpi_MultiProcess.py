@@ -273,26 +273,27 @@ class MultiProcess:
             # except Exception as e:
             #     print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
             #     break
+                self.lock.acquire()
+                print('\nlock acquired to send ACK')
+                try:
+                    message = self.STM.STM_connection.read(1).strip().decode() 
 
-                message = self.STM.STM_connection.read(1).strip().decode() 
-
-                if message is None:
-                    continue
-                print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
-                if len(message) != 0:
-                    if 'R' in message or "\x00" in message:
-                        self.lock.acquire()
-                        print('\nlock acquired to send ACK')
-                        try:
+                    if message is None:
+                        continue
+                    print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
+                    if len(message) != 0:
+                        if 'R' in message or "\x00" in message:
                             print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
                             self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                             print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
                             # time.sleep(1.5)
-                        finally:
-                           self.lock.release() 
-                           print('\nlock released after sending ACK')
-                    else:
-                        continue
+
+                        else:
+                            continue        
+                finally:
+                    self.lock.release() 
+                    print('\nlock released after sending ACK')
+
                 # print("slowing down for 3 seconds")
                 # time.sleep(3)
             except Exception as e:
