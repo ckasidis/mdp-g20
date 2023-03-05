@@ -16,16 +16,16 @@ class AlgoPC(object):
 		self.client = None
 		self.addr = None
 		HOST = '192.168.20.25' # Server IP or Hostname
-		self.PORT = 12345  # Pick an open Port (1000+ recommended), must match the client sport
+		self.PORT = 3004  # Pick an open Port (1000+ recommended), must match the client's port
 		self.sever = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.connect.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.sever.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		print('Socket created')
         # managing error exception
 		try:
 			self.sever.bind((HOST, self.PORT))
 			self.sever.listen(1)
 		except socket.error:
-			print ('Bind failed ')
+			print ('Socket Bind failed \n\n')
 
 
 	# Getter method to check is connection is established
@@ -33,19 +33,19 @@ class AlgoPC(object):
 		return self.isConnected
 
 	def connect(self):
-		print(f"Waiting for connection with ALgo PC")
+		print(f"\nWaiting for connection with ALgo PC")
 		while self.isConnected == False:
 			try:
 				if self.client is None:
 					# Accepts the connection
-					self.sever.listen(5)
+					# self.sever.listen(5)
 					print ('Socket awaiting messages')
 					self.client, self.addr = self.sever.accept()
-					print ('Algo PC Connected')
+					print (f'[SUCCESSFUL CONNECTION] Algo PC Connected at {self.client};{self.addr}\n\n')
 					self.isConnected = True
 
 			except Exception as e:
-				print(f"[ERROR] Unable to establish connection with Algo PC")
+				print(f"[ERROR] Unable to establish connection with Algo PC\n\n")
 				self.client.close()
 				self.client = None
 				# Retry to connect

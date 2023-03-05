@@ -37,13 +37,13 @@ class Android(object):
 		return self.isConnected
 
 	def connect(self):
-		print(f"Waiting for connection with Android Tablet on RFCOMM channel {self.port} ...")
+		print(f"\nWaiting for connection with Android Tablet on RFCOMM channel {self.port} ...")
 		while self.isConnected == False:
 			try:
 				if self.client is None:
 					# Accepts the connection
 					self.client, address = self.server.accept()
-					print(f"[SUCCESSFUL CONNECTION]: Successfully established connection with Android Tablet from {address}.")
+					print(f"[SUCCESSFUL CONNECTION]: Successfully established connection with Android Tablet from {address}.\n\n")
 					self.isConnected = True
 
 			except Exception as e:

@@ -17,13 +17,13 @@ class STM32(object):
 	def connect(self):
 		while not self.isConnected:
 			try:
-				print("Establishing connection with STM32 Board ...")
+				print("\nEstablishing connection with STM32 Board ...")
 
 				# Create a Serial instance named 'ser'
 				self.ser = serial.Serial(self.port, self.baudrate, timeout = 20)
 				# Check if the serial instance is open
 				if (self.ser.is_open):
-					print("[SUCCESSFUL CONNECTION]: Successfully established connection with STM32 Board.")
+					print("[SUCCESSFUL CONNECTION]: Successfully established connection with STM32 Board.\n\n")
 					self.isConnected = True
 
 			except Exception as e:
