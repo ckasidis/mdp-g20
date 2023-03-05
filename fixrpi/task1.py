@@ -155,7 +155,7 @@ if __name__ == '__main__':
 			# Auto Mode
 			if '$' in msg: #Algo command list 
 				msg = msg.split('$')
-				obslst = msg[0]
+				obslst = msg[0].split(',')
 				print("[FROM ALGO PC] Obstacle Traversal", obslst)
 				algo_commands = msg[1].split(",")
 				print("[FROM ALGO PC]")
