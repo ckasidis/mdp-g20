@@ -191,25 +191,26 @@ if __name__ == '__main__':
 					image = takePic()
 					process_image(0, image)
 			elif command == "RPI|": #Path planing to RPi
-				if content[:1] == "S":
-					x = content[1:]
-					interfaces[ANDROID].write(f"Taking picture for obstacle {x}")
-					image = takePic()
-					result_msg = process_image(x, image)
-					print(result_msg)
-					interfaces[ANDROID].write(result_msg)				
-				elif content[:5] == "start":
-					while True:
-						ans = input("Enter yes to start")
-						if ans == "yes":
-							break
-					interfaces[ANDROID].write("Start exploring")
-				elif content[:1] == "O":
-					x = content[1:]
-					interfaces[ANDROID].write(f"Heading to obstacle {x}")
-					print(f"Heading to obstacle at {x}")
-				else:
-					continue
+				# if content[:1] == "S":
+				x = content[1:]
+				interfaces[ANDROID].write(f"Taking picture for obstacle {x}")
+				image = takePic()
+				result_msg = process_image(x, image)
+				print('obst list',obslst)
+				print(result_msg)
+				interfaces[ANDROID].write(result_msg)				
+				# elif content[:5] == "start":
+				# 	while True:
+				# 		ans = input("Enter yes to start")
+				# 		if ans == "yes":
+				# 			break
+					# interfaces[ANDROID].write("Start exploring")
+				# elif content[:1] == "O":
+				# 	x = content[1:]
+				# 	interfaces[ANDROID].write(f"Heading to obstacle {x}")
+				# 	print(f"Heading to obstacle at {x}")
+				# else:
+				# 	continue
 
 	except Exception as e:
 		print(f"[ERROR] {str(e)}")
