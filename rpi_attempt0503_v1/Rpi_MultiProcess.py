@@ -31,7 +31,7 @@ class MultiProcess:
         self.lock = False
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
-    
+        self.to_STM_message_queue = self.manager.Queue()
         
         self.read_AND_process = Process(target=self._read_AND)
         self.read_ALG_process = Process(target=self._read_ALG)
@@ -146,19 +146,16 @@ class MultiProcess:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                             print("RPI ENDING NOW...")
                             sys.exit()
-                        elif messages[0] == 'AND_PATH':
+                        elif messages[0] == 'STM':
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.to_AND_message_queue.put_nowait(messages[1].encode())
-                        elif messages[0] == 'AND_IMAGE':
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.to_AND_message_queue.put_nowait(messages[1].encode())
-                        else:
-                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                            self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
-                            while True:
-                                self._read_STM()
-                                if self.lock:
-                                    break
+                            self.to_STM_message_queue.put_nowait(messages[1].encode())
+                        # else:
+                        #     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                        #     self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
+                        #     while True:
+                        #         self._read_STM()
+                        #         if self.lock:
+                        #             break
                 break # added the break statement to avoid infinite 'none' loop
 
             except Exception as e:
@@ -182,22 +179,39 @@ class MultiProcess:
             return wrapper
         return function
 
-    @break_after(4)
+    # @break_after(4)
+    def _write_STM(self):
+        while True:
+            target = None
+            try:
+                if not self.to_STM_message_queue.empty():
+                    print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
+                    self.STM.write_to_STM(payload)
+                    print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
+                    while True:
+                        if self.lock==True:
+                            break
+            except Exception as e:
+                print(Fore.RED + '[MultiProcess-WRITE-STM ERROR] %s' % str(e))
+
+
+
     def _read_STM(self):
         print("In STM Read Func")
-        # while True:
-        try:
-            message = self.STM.STM_connection.read(1)
-            message = message.strip().decode() 
-            print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
-            # if 'R' in message: 
-            print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', 'R'))
-            # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
-            self.lock=True
+        while True:
+            try:
+                if not self.to_STM_message_queue.empty():
+                    message = self.STM.STM_connection.read(1)
+                    message = message.strip().decode() 
+                    print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
+                    if 'R' in message: 
+                        print(Fore.LIGHTRED_EX + '\nSTM sent the ack R in the message %s' % (message))
+                    # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
+                    self.lock=True
 
-        except Exception as e:
-            print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
-            # break
+            except Exception as e:
+                print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
+                break
 
     def _write_AND(self):
         while True:
