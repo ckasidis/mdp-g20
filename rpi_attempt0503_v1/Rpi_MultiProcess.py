@@ -191,6 +191,7 @@ class MultiProcess:
             retry = True
             try:
                 if retry:
+                    self.lock=False
                     message = self.STM.STM_connection.read(1)
                     message = message.strip().decode() 
                     print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
