@@ -266,7 +266,8 @@ class MultiProcess:
                         print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
                         self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                         print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-
+                print("slowing down for 3 seconds")
+                time.sleep(3)
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
                 break
