@@ -182,7 +182,7 @@ class MultiProcess:
         self.lock=True
         return function
 
-    @break_after(5)
+    @self.break_after(5)
     def _read_STM(self):
         print("In STM Read Func")
         # while True:
