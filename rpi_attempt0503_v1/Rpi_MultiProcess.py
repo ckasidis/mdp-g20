@@ -277,6 +277,7 @@ class MultiProcess:
                         self.lock = True
                     else:
                         self.lock=False
+                        continue
                 # print("slowing down for 3 seconds")
                 # time.sleep(3)
             except Exception as e:
