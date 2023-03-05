@@ -156,7 +156,7 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
                                 self._read_STM()
-                                if self.lock==True:
+                                if self.lock:
                                     break
                 break # added the break statement to avoid infinite 'none' loop
 
@@ -164,7 +164,7 @@ class MultiProcess:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 
-    def break_after(seconds=2):
+    def break_after(self, seconds=2):
         def timeout_handler(signum, frame):   # Custom signal handler
             raise TimeoutException
         def function(function):
@@ -179,6 +179,7 @@ class MultiProcess:
                     print (f'Oops, timeout: %s sec reached.' % seconds, function.__name__, args, kwargs)
                 return
             return wrapper
+        self.lock=True
         return function
 
     @break_after(5)
@@ -190,7 +191,7 @@ class MultiProcess:
             message = message.strip().decode() 
             print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
             # if 'R' in message: 
-            print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
+            print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', 'R'))
             # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
             self.lock=True
 
