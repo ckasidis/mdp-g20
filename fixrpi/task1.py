@@ -150,13 +150,15 @@ if __name__ == '__main__':
 			#print(f"msg get from queue: {msg}")
 			if "RPI" in msg:
 				print("msg")
-				interfaces[ANDROID].write("Message received")
+				# interfaces[ANDROID].write("Message received")
 				break
 			# Auto Mode
-			if "," in msg and "|" in msg and '$' in msg: #Algo command list 
+			if '$' in msg: #Algo command list 
 				msg = msg.split('$')
 				obslst = msg[0]
+				print("[FROM ALGO PC] Obstacle Traversal", obslst)
 				algo_commands = msg[1].split(",")
+				print("[FROM ALGO PC]")
 				for i in algo_commands:
 					queue.put(i)
 					print(f"put in queue {i}")
@@ -171,14 +173,15 @@ if __name__ == '__main__':
 
 			# Process the message
 			content = msg[idx+1:]
-			if command == "ALGO|" : #Path planning to STM
-				interfaces[ALGOPC].write(content)
+			if command == "STM|" : #Path planning to STM
+				interfaces[STM].write(content)
 				#time.sleep(5) #need to adjust 
 				readSTM(content)
 				print(f"[FROM STM]: finish executing {content}")
 
 			elif command == "ALGO|" : #Android to path planning
 				interfaces[ALGOPC].write(content)
+
 			elif command == "AR|":
 				if content[:8] == "starting":
 					interfaces[ALGOPC].write(content)
