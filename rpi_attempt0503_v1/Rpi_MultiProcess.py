@@ -12,9 +12,7 @@ import socket
 import cv2
 import imagezmq
 import signal
-
 from picamera.array import PiRGBArray
-
 init(autoreset=True)
 
 class TimeoutException(Exception):   # Custom exception class
@@ -48,7 +46,7 @@ class MultiProcess:
         self.lock = Lock()
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
-    
+        self.commands = []
         
         self.read_AND_process = Process(target=self._read_AND)
         self.read_ALG_process = Process(target=self._read_ALG)
@@ -79,7 +77,8 @@ class MultiProcess:
             self.ALG.connect_ALG()
             self.STM.connect_STM()
             
-            self.read_AND_process.start() #start() refers to Process object to start the process
+            #start() refers to Process object to start the process
+            self.read_AND_process.start() 
             self.read_ALG_process.start()
             self.read_STM_process.start()
     
@@ -122,12 +121,8 @@ class MultiProcess:
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
                             assert isinstance(messages, object)
                             self.message_queue.put_nowait(self._format_for('ALG', (messages[1]).encode()))
-                            print('queued')
                         elif messages[0] == 'RPI_END':
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
-                            # assert isinstance(messages, object)
-                            # self.message_queue.put_nowait(self._format_for(messages[0], (messages[1]).encode()))
-                            # print('queued')
                             sys.exit()
                         else:
                             print(Fore.WHITE + 'AND > %s , %s' % (str(messages[0]), str(messages[1])))
@@ -137,7 +132,7 @@ class MultiProcess:
                 print(Fore.RED + '[MultiProcess-READ-AND ERROR] %s' % str(e))
                 break
     
-    def _read_ALG(self):
+    def _read_ALG_custom(self):
         while True:
             try:
                 message = self.ALG.read_from_ALG()
@@ -147,6 +142,7 @@ class MultiProcess:
                 messages = message.split('$',1) # to split commands and obstacle list
                 message_list = messages[0].split(",")
                 print("[_read_ALG] Command Msg List : ", message_list)
+                self.commands = message_list
                 self.obslst = messages[1].split(",")
                 print("[_read_ALG] Obstacle Traversal Order : ", self.obslst)
 
@@ -174,7 +170,7 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
                                 self._read_STM()
-                                if self.lock.acquire():
+                                if not self.lock.acquire():
                                     break
                 break # added the break statement to avoid infinite 'none' loop
 
@@ -182,34 +178,82 @@ class MultiProcess:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 
+    def _read_ALG(self):
+        while True:
+            try:
+                message = self.ALG.read_from_ALG()
+                print("[_read_ALG] Message recvd as is", message)
+                if message is None:
+                    continue
+                messages = message.split('$',1) # to split commands and obstacle list
+                self.obslst = messages[0].split(",")
 
+                message = self.ALG.read_from_ALG()
+                message_list = message.splitlines()
+                print("\n[_read_ALG] Command Msg List : ", message_list)
+                self.commands = message_list
+                print("\n[_read_ALG] Obstacle Traversal Order : ", self.obslst)
 
-    @break_after(3)
-    def _read_STM(self):
+                for msg in message_list:
+                    if len(msg) != 0:
+
+                        messages = msg.split('|', 1)
+
+                        # Message format for Image Rec: RPI|
+                        if messages[0] == 'RPI':
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
+                            self.image_queue.put_nowait('take')
+                        elif messages[0] == 'RPI_END': # end keyword
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
+                            print("RPI ENDING NOW...")
+                            sys.exit()
+                        else: # STM 
+                            print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                            self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
+
+            except Exception as e:
+                print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
+                break
+
+    @break_after(5)
+    def _read_STM_custom(self):
         print("In STM Read Func")
         while True:
-            # retry = True
             try:
-                # if retry:
-                    self.lock.acquire()
+                # with self.lock:
                     message = self.STM.STM_connection.read(1).strip().decode() 
-                    # message = message.strip().decode() 
                     print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
                     if 'R' or '\x00' or '' in message: 
                         print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', message))
-                        self.lock.release()
+                        self.STM.STM_connection.flush()
+                        break
                         # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
                     # self.lock.release()
-                    # break
+                    
+            except Exception as e:
+                print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
+                break
+
+    def _read_STM(self):
+        print("In STM Read Func")
+        while True:
+            try:
+                message = self.STM.STM_connection.read(1).strip().decode() 
+
+                if message is None:
+                    continue
+                print(Fore.LIGHTCYAN_EX + "STM Message received " + message.decode())
+                if len(message) != 0:
+                    if str(message) =='R':
+                        print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
+                        self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
+                    else:
+                        print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(messages))
 
             except Exception as e:
-                # if retry:
-                #     continue
-                    # retry=False
-                else:
-                    print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
-                    break
-
+                print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
+                break
+ 
     def _write_AND(self):
         while True:
             try:

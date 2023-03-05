@@ -48,8 +48,7 @@ class STM:
     def read_from_STM(self):
         print("Reading")
         try:
-            self.STM_connection.flush()
-            
+            # self.STM_connection.flush()
             get_message = self.STM_connection.read(9)
             print(get_message)            
 
@@ -70,6 +69,8 @@ class STM:
 
             print('In STM: write to STM method: before Transmitted to STM:')
             print('\t %s' % message)
+            self.STM_connection.flushInput()
+            self.STM_connection.flushOutput()
             self.STM_connection.write(message)
             print(message.decode()+" sent")
             print('In STM: write to STM method: after Transmitted to STM')
