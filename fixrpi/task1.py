@@ -197,7 +197,7 @@ if __name__ == '__main__':
 				image = takePic()
 				result_msg = process_image(x, image)
 				print('obst list',obslst)
-				result_msg = obslst[0]+result_msg
+				result_msg = obslst[0]+'-'+result_msg
 				obslst.pop(0)
 				interfaces[ANDROID].write(result_msg)				
 				# elif content[:5] == "start":
