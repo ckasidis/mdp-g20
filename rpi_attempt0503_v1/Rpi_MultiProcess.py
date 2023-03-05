@@ -240,21 +240,36 @@ class MultiProcess:
         print("In STM Read Func")
         while True:
             try:
-                message = self.STM.STM_connection.read(1).strip().decode() 
+                message = self.STM.read_from_STM()
+                # message = self.STM.STM_connection.read(1).strip().decode() 
+                message_list = message.decode().splitlines()
+                for msg in message_list:
+                    if len(msg) != 0:
+                        messages = msg.split('|', 1)
 
-                if message is None:
-                    continue
-                print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
-                if len(message) != 0:
-                    if str(message) =='R' or str(message)=="\x00":
-                        print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
-                        self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
-                    else:
-                        print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
+                        if "\x00" or "R" or "" in messages:
+                            messages[0] = 'R'
+                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (R))
+                            self.message_queue.put_nowait(self._format_for('ALG', ('R\n').encode()))
+                        else:
+                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(messages))
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
                 break
+            #     if message is None:
+            #         continue
+            #     print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
+            #     if len(message) != 0:
+            #         if str(message) =='R' or str(message)=="\x00":
+            #             print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
+            #             self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
+            #         else:
+            #             print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
+
+            # except Exception as e:
+            #     print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
+            #     break
  
     def _write_AND(self):
         while True:
