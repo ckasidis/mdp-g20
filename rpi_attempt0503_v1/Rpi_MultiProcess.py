@@ -54,6 +54,8 @@ class MultiProcess:
         self.read_STM_process = Process(target=self._read_STM,)
         # self.read_STM_process = Process(target=self._read_STM, args=(self.lock))
 
+        self.cmd_count=1
+        self.ack_count=1
 
         self.write_AND_process = Process(target=self._write_AND)
         self.write_process = Process(target=self._write_target)
@@ -63,7 +65,6 @@ class MultiProcess:
 
         self.sender = None
 
-        self.start = False
 
         self.image_queue = self.manager.Queue()
         self.image_process = Process(target = self._take_pic)
@@ -184,8 +185,6 @@ class MultiProcess:
 
     def _read_ALG(self):
         while True:
-            self.lock.acquire()
-            print('\nlock acquired to read from ALG\n')
             try:
                 message = self.ALG.read_from_ALG()
                 print("[_read_ALG] Message recvd as is", message)
@@ -209,26 +208,20 @@ class MultiProcess:
 
                             # Message format for Image Rec: RPI|
                             if messages[0] == 'RPI':
-                                try:
-                                    print('\nlock acquired to take new pic\n')
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
                                     self.image_queue.put_nowait('take')
                                     time.sleep(0.5)
-                                finally:
-                                    self.lock.release()
+                                    
 
                             elif messages[0] == 'RPI_END': # end keyword
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                                 print("RPI ENDING NOW...")
                                 sys.exit()
                             else: # STM
-                                try:
-                                    print('\nlock acquired to send new command\n')
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                                    self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                    self.cmd_count+=1
+                                    self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                                     time.sleep(0.5)
-                                finally:
-                                    self.lock.release()
 
 
 
@@ -259,9 +252,6 @@ class MultiProcess:
         print("In STM Read Func")
         while True:
             try:
-                self.lock.acquire()
-                print('\nlock acquired to send ACK')
-                try:
                     message = self.STM.STM_connection.read(1).strip().decode() 
 
                     if message is None:
@@ -269,17 +259,26 @@ class MultiProcess:
                     print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
                     if len(message) != 0:
                         if 'R' in message or "\x00" in message:
-                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
-                            self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
-                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                            # time.sleep(1.5)
-
+                            if (self.ack_count - self.cmd_count == -1):
+                                print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
+                                self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
+                                print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
+                                # time.sleep(1.5)
+                                self.ack_count+=1
+                                print(f'ack count {self.ack_count}; cmd count {self.ack_count}')
+                            elif self.ack_count>self.cmd_count:
+                                continue
+                            else:
+                                difference = self.cmd_count-self.ack_count
+                                for i in range(difference):
+                                    print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
+                                    self.message_queue.put(self._format_for('ALG', ('R').encode()))
+                                    print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
+                                    # time.sleep(1.5)
+                                    self.ack_count+=1
+                                    print(f'ack count {self.ack_count}; cmd count {self.ack_count}')
                         else:
                             continue        
-                finally:
-                    self.lock.release() 
-                    print('\nlock released after sending ACK')
-
                 # print("slowing down for 3 seconds")
                 # time.sleep(3)
             except Exception as e:
@@ -347,8 +346,6 @@ class MultiProcess:
             while True:
                 try:
                     if not self.image_queue.empty():
-                        # self.lock.acquire()
-                        # try:
                             test = self.image_queue.get_nowait()
                             self.rpi_name = socket.gethostname()
                             self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
