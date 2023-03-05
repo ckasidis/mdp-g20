@@ -182,11 +182,11 @@ class MultiProcess:
     # @break_after(4)
     def _write_STM(self):
         while True:
-            target = None
             try:
                 if not self.to_STM_message_queue.empty():
+                    message = self.to_STM_message_queue.get_nowait()
                     print(Fore.LIGHTCYAN_EX + 'To STM: before write to STM method')
-                    self.STM.write_to_STM(payload)
+                    self.STM.write_to_STM(message)
                     print(Fore.LIGHTCYAN_EX + 'To STM: after write to STM method')
                     while True:
                         if self.lock==True:
