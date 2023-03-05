@@ -50,15 +50,15 @@ def takePic():
 	return image
 
 # Processing image - send it to the image processing server
-def process_image(x, image):
+def process_image(image):
 	# Initialise the ImageSender object with the socket address of the server
 	image_sender = imagezmq.ImageSender(connect_to = image_processing_server_url)
 	global image_count, image_id_lst
 	try:
-			if x == "0":
-				image_sender.send_image("gg", image)
-				print("sent gg for end of task")
-				return
+			# if x == "0":
+				# image_sender.send_image("gg", image)
+				# print("sent gg for end of task")
+				# return
 			rpi_name = socket.gethostname() # send RPi hostname with each image
 			print("[MAIN] Sending image to image processing server...")
 			reply = image_sender.send_image(rpi_name, image)
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
 			elif command == "RPI|": #Path planing to RPi
 				image = takePic()
-				result_msg = process_image(x, image)
+				result_msg = process_image(image)
 				print('obst list',obslst)
 				result_msg = obslst[0]+'-'+result_msg
 				obslst.pop(0)
