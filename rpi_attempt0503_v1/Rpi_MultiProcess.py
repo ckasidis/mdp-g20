@@ -3,7 +3,7 @@ from AlgoInterface import Algo
 from AndroidInterface import Android
 from STMInterface import STM
 from colorama import *
-from multiprocessing import Process, Value, Queue, Manager
+from multiprocessing import Process, Value, Queue, Manager, Lock
 import time
 from datetime import datetime
 import sys 
@@ -45,7 +45,7 @@ class MultiProcess:
         self.STM = STM()
         self.obslst = []
         self.manager = Manager()
-        self.lock = False
+        self.lock = Lock()
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
     
@@ -174,7 +174,7 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
                                 self._read_STM()
-                                if self.lock:
+                                if not self.lock.locked():
                                     break
                 break # added the break statement to avoid infinite 'none' loop
 
@@ -191,14 +191,14 @@ class MultiProcess:
             retry = True
             try:
                 if retry:
-                    self.lock=False
-                    message = self.STM.STM_connection.read(1).strip().decode() 
-                    # message = message.strip().decode() 
-                    print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
-                    if 'R' or '\x00' or '' in message: 
-                        print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', message))
-                    # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
-                        self.lock=True
+                    with self.lock:
+                        message = self.STM.STM_connection.read(1).strip().decode() 
+                        # message = message.strip().decode() 
+                        print(Fore.LIGHTCYAN_EX + '\n[_read_STM] Message recvd and decoded as ',str(message)) 
+                        if 'R' or '\x00' or '' in message: 
+                            print(Fore.LIGHTRED_EX + '\nSTM > %s , %s' % ('ALG', message))
+                        # self.message_queue.put_nowait(self._format_for('ALG', 'R'))
+                    # self.lock.release()
                     break
 
             except Exception as e:
