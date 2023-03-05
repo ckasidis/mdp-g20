@@ -175,10 +175,10 @@ class MultiProcess:
                 print(Fore.LIGHTRED_EX + 'STM > %s , %s' % ('ALG', 'R'))
                 self.message_queue.put_nowait(self._format_for('ALG', 'R'))
                 self.lock=True
-                
+
         except Exception as e:
             print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
-            break
+            # break
 
     def _write_AND(self):
         while True:
