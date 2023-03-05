@@ -20,6 +20,23 @@ init(autoreset=True)
 class TimeoutException(Exception):   # Custom exception class
     pass
 
+def break_after(seconds=2):
+    def timeout_handler(signum, frame):   # Custom signal handler
+        raise TimeoutException
+    def function(function):
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(seconds)
+            try:
+                res = function(*args, **kwargs)
+                signal.alarm(0)      # Clear alarm
+                return res
+            except TimeoutException:
+                print (f'Oops, timeout: %s sec reached.' % seconds, function.__name__, args, kwargs)
+            return
+        return wrapper
+    return function
+
 
 class MultiProcess:
     def __init__(self):
@@ -165,24 +182,9 @@ class MultiProcess:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
                 break
 
-    def break_after(seconds=2):
-        def timeout_handler(signum, frame):   # Custom signal handler
-            raise TimeoutException
-        def function(function):
-            def wrapper(*args, **kwargs):
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(seconds)
-                try:
-                    res = function(*args, **kwargs)
-                    signal.alarm(0)      # Clear alarm
-                    return res
-                except TimeoutException:
-                    print (f'Oops, timeout: %s sec reached.' % seconds, function.__name__, args, kwargs)
-                return
-            return wrapper
-        return function
 
-    # @break_after(4)
+
+    @break_after(3)
     def _read_STM(self):
         print("In STM Read Func")
         while True:
