@@ -43,9 +43,10 @@ class MultiProcess:
         self.STM = STM()
         self.obslst = []
         self.manager = Manager()
-        self.lock = Lock()
+
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
+        
         self.commands = []
         
         self.read_AND_process = Process(target=self._read_AND)
@@ -53,9 +54,6 @@ class MultiProcess:
         self.read_ALG_process = Process(target=self._read_ALG)
         self.read_STM_process = Process(target=self._read_STM,)
         # self.read_STM_process = Process(target=self._read_STM, args=(self.lock))
-
-        self.cmd_count=1
-        self.ack_count=1
 
         self.write_AND_process = Process(target=self._write_AND)
         self.write_process = Process(target=self._write_target)
@@ -209,19 +207,17 @@ class MultiProcess:
                             # Message format for Image Rec: RPI|
                             if messages[0] == 'RPI':
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
-                                    self.image_queue.put_nowait('take')
-                                    time.sleep(0.5)
-                                    
+                                    # self.message_queue.put_nowait(self._format_for('STM', 'FW00'.encode()))
+                                    self.image_queue.put('take')
 
                             elif messages[0] == 'RPI_END': # end keyword
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                                 print("RPI ENDING NOW...")
                                 sys.exit()
                             else: # STM
-                                    print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                                    self.cmd_count+=1
-                                    self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
-                                    time.sleep(0.5)
+                                print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                                self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                time.sleep(0.5)
 
 
 
@@ -260,9 +256,10 @@ class MultiProcess:
                     if len(message) != 0:
                         if 'R' in message or "\x00" in message:
                             print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
-                            self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
-                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
+                            self.message_queue.put(self._format_for('ALG', ('R').encode()))
+                            
                         else:
+                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
                             continue        
                 # print("slowing down for 3 seconds")
                 # time.sleep(3)
@@ -274,7 +271,7 @@ class MultiProcess:
         while True:
             try:
                 if not self.to_AND_message_queue.empty():
-                    message = self.to_AND_message_queue.get_nowait()
+                    message = self.to_AND_message_queue.get()
                     self.AND.write_to_AND(message)
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-WRITE-AND ERROR] %s' % str(e))
@@ -285,7 +282,7 @@ class MultiProcess:
             target = None
             try:
                 if not self.message_queue.empty():
-                    message = self.message_queue.get_nowait()
+                    message = self.message_queue.get()
                     print("msg :"+str(message))    
                     target, payload = message['target'], message['payload']
                     print(payload)
@@ -331,7 +328,7 @@ class MultiProcess:
             while True:
                 try:
                     if not self.image_queue.empty():
-                            test = self.image_queue.get_nowait()
+                            test = self.image_queue.get()
                             self.rpi_name = socket.gethostname()
                             self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
                             self.rawCapture = PiRGBArray(self.camera)
