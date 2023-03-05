@@ -173,7 +173,7 @@ class MultiProcess:
                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
-                                # self._read_STM()
+                                self._read_STM()
                                 if self.lock:
                                     break
                 break # added the break statement to avoid infinite 'none' loop
