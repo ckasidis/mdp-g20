@@ -18,7 +18,7 @@ class AlgoPC(object):
 		HOST = '192.168.20.25' # Server IP or Hostname
 		self.PORT = 3004  # Pick an open Port (1000+ recommended), must match the client's port
 		self.sever = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.sever.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		# self.sever.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		print('Socket created')
         # managing error exception
 		try:
