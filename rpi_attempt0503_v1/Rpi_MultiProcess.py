@@ -43,7 +43,7 @@ class MultiProcess:
         self.STM = STM()
         self.obslst = []
         self.manager = Manager()
-        self.lock = self.manager.Lock()
+        self.lock = Lock()
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
         self.commands = []
@@ -268,11 +268,14 @@ class MultiProcess:
                 print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
                 if len(message) != 0:
                     if 'R' in message or "\x00" in message:
-                        with self.lock:
+                        self.lock.acquire()
+                        try:
                             print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
                             self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                             print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                            time.sleep(1.5)
+                            # time.sleep(1.5)
+                        finally:
+                           self.lock.release() 
                     else:
                         continue
                 # print("slowing down for 3 seconds")
