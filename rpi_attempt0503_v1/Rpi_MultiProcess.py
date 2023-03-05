@@ -223,8 +223,9 @@ class MultiProcess:
                             else: # STM
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                                 self.sendnext=False
+                                time.sleep(1)
                                 self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
-                                time.sleep(0.5)
+
 
 
             except Exception as e:
@@ -252,8 +253,9 @@ class MultiProcess:
 
     def _read_STM(self):
         print("In STM Read Func")
-        while self.sendnext==False:
+        while True:
             try:
+                if self.sendnext==False:
                     message = self.STM.STM_connection.read(1).strip().decode() 
 
                     if message is None:
@@ -330,9 +332,9 @@ class MultiProcess:
     def _take_pic(self):
             # Start the Image Rec process
             self.sender = imagezmq.ImageSender(connect_to='tcp://192.168.20.25:5555') #Connection to Image Processing Server
-            while self.sendImg:
+            while True:
                 try:
-                    if not self.image_queue.empty():
+                    if not self.image_queue.empty() and self.sendImg:
                             test = self.image_queue.get()
                             self.rpi_name = socket.gethostname()
                             self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
@@ -346,7 +348,7 @@ class MultiProcess:
                             self.camera.stop_preview()
                             self.camera.close()
 
-                            #Reply received from the Image Processing Server
+                            # Reply received from the Image Processing Server
                             self.reply = self.sender.send_image(self.rpi_name, self.image)
                             self.reply = str(self.reply.decode())
                             print(Fore.LIGHTYELLOW_EX + 'Reply message: ' + self.reply)
@@ -366,8 +368,6 @@ class MultiProcess:
                                 print(message_obst)
                                 self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
                                 print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
-                        # finally:
-                        #     self.lock.release()
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
