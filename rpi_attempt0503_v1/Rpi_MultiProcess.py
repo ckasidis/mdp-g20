@@ -156,8 +156,8 @@ class MultiProcess:
                             self.message_queue.put_nowait(self._format_for(messages[0], messages[1].encode()))
                             while True:
                                 self._read_STM()
-                                if self.lock:
-                                    break
+                                # if self.lock:
+                                #     break
                 break # added the break statement to avoid infinite 'none' loop
 
             except Exception as e:
@@ -179,10 +179,9 @@ class MultiProcess:
                     print (f'Oops, timeout: %s sec reached.' % seconds, function.__name__, args, kwargs)
                 return
             return wrapper
-        self.lock=True
         return function
 
-    @self.break_after(5)
+    @break_after(4)
     def _read_STM(self):
         print("In STM Read Func")
         # while True:
