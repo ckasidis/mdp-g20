@@ -207,7 +207,7 @@ class MultiProcess:
                             # Message format for Image Rec: RPI|
                             if messages[0] == 'RPI':
                                     print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
-                                    # self.message_queue.put_nowait(self._format_for('STM', 'FW00'.encode()))
+                                    self.message_queue.put_nowait(self._format_for('STM', 'FW000'.encode()))
                                     self.image_queue.put('take')
 
                             elif messages[0] == 'RPI_END': # end keyword
