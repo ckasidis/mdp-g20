@@ -43,7 +43,7 @@ class MultiProcess:
         self.STM = STM()
         self.obslst = []
         self.manager = Manager()
-        self.lock = Lock()
+        self.lock = True
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
         self.commands = []
@@ -210,8 +210,13 @@ class MultiProcess:
                                 print("RPI ENDING NOW...")
                                 sys.exit()
                             else: # STM 
-                                print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
-                                self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                while True:
+                                    if self.lock==False:
+                                        print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
+                                        self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                        self.lock=True
+                                        break
+
 
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-ALG ERROR] %s' % str(e))
@@ -266,8 +271,9 @@ class MultiProcess:
                         print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
                         self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                         print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                print("slowing down for 3 seconds")
-                time.sleep(3)
+                        self.lock = False
+                # print("slowing down for 3 seconds")
+                # time.sleep(3)
             except Exception as e:
                 print(Fore.RED + '[MultiProcess-READ-STM ERROR] %s' % str(e))
                 break
