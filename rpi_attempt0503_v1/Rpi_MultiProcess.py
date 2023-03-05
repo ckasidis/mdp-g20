@@ -43,7 +43,7 @@ class MultiProcess:
         self.STM = STM()
         self.obslst = []
         self.manager = Manager()
-        self.lock = True
+        self.lock = self.manager.Lock()
         self.to_AND_message_queue = self.manager.Queue()
         self.message_queue = self.manager.Queue()
         self.commands = []
@@ -211,10 +211,9 @@ class MultiProcess:
                                 sys.exit()
                             else: # STM 
                                 while True:
-                                    if self.lock:
+                                    if self.lock.acquire():
                                         print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                                         self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
-                                        self.lock=False
                                         break
 
 
@@ -269,14 +268,12 @@ class MultiProcess:
                 print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
                 if len(message) != 0:
                     if 'R' in message or "\x00" in message:
-                        self.lock=False
-                        print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
-                        self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
-                        print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
-                        time.sleep(1.5)
-                        self.lock = True
+                        with self.lock:
+                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
+                            self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
+                            print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
+                            time.sleep(1.5)
                     else:
-                        self.lock=False
                         continue
                 # print("slowing down for 3 seconds")
                 # time.sleep(3)
