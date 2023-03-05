@@ -242,7 +242,7 @@ class MultiProcess:
 
                 if message is None:
                     continue
-                print(Fore.LIGHTCYAN_EX + "STM Message received " + message.decode())
+                print(Fore.LIGHTCYAN_EX + "STM Message received " + message)
                 if len(message) != 0:
                     if str(message) =='R':
                         print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
