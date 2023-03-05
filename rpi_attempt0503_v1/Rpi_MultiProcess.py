@@ -203,22 +203,29 @@ class MultiProcess:
 
                             # Message format for Image Rec: RPI|
                             if messages[0] == 'RPI':
-                                print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
-                                self.image_queue.put_nowait('take')
+                                self.lock.acquire()
+                                try:
+                                    print('lock acquired to take new pic')
+                                    print(Fore.LIGHTGREEN_EX + 'ALG > %s, %s' % (str(messages[0]), 'take pic'))
+                                    self.image_queue.put_nowait('take')
+                                    time.sleep(0.5)
+                                finally:
+                                    self.lock.release()
+                                    print('lock released after taking pic')
                             elif messages[0] == 'RPI_END': # end keyword
                                 print(Fore.LIGHTGREEN_EX + 'ALG > %s' % (str(messages[0])))
                                 print("RPI ENDING NOW...")
                                 sys.exit()
                             else: # STM 
-                                while True:
                                         self.lock.acquire()
                                         try:
                                             print('\nlock acquired to send new command')
                                             print(Fore.LIGHTGREEN_EX + 'ALG > %s , %s' % (str(messages[0]), str(messages[1])))
                                             self.message_queue.put(self._format_for(messages[0], messages[1].encode()))
+                                            time.sleep(0.5)
                                         finally:
                                             self.lock.release()
-                                        break
+                                            print('lock released after sending new command')
 
 
             except Exception as e:
@@ -275,7 +282,7 @@ class MultiProcess:
                         self.lock.acquire()
                         print('lock acquired')
                         try:
-                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s' % (str(message)))
+                            print(Fore.LIGHTRED_EX + 'STM > ALG | %s\n' % (str(message)))
                             self.message_queue.put_nowait(self._format_for('ALG', ('R').encode()))
                             print(Fore.LIGHTBLUE_EX + '[Debug] Message from STM: %s' % str(message))
                             # time.sleep(1.5)
@@ -351,8 +358,8 @@ class MultiProcess:
             while True:
                 try:
                     if not self.image_queue.empty():
-                        self.lock.acquire()
-                        try:
+                        # self.lock.acquire()
+                        # try:
                             test = self.image_queue.get_nowait()
                             self.rpi_name = socket.gethostname()
                             self.camera = PiCamera(resolution=(640, 640)) #Max resolution 2592,1944
@@ -386,8 +393,8 @@ class MultiProcess:
                                 print(message_obst)
                                 self.message_queue.put_nowait(self._format_for('AND',message_obst.encode()))
                                 print(Fore.LIGHTYELLOW_EX + 'Message send across to AND: ' + message_obst)
-                        finally:
-                            self.lock.release()
+                        # finally:
+                        #     self.lock.release()
                 
                 except Exception as e:
                     print(Fore.RED + '[MultiProcess-PROCESS-IMG ERROR] %s' % str(e))
