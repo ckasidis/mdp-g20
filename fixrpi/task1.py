@@ -148,10 +148,10 @@ if __name__ == '__main__':
 			# Retrieve messages
 			msg = queue.get()
 			#print(f"msg get from queue: {msg}")
-			if "RPI" in msg:
-				print("msg")
+			# if "RPI" in msg:
+			# 	print("msg")
 				# interfaces[ANDROID].write("Message received")
-				break
+				# break
 			# Auto Mode
 			if '$' in msg: #Algo command list 
 				msg = msg.split('$')
