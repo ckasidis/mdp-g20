@@ -5,10 +5,10 @@
 import time
 import bluetooth
 import os
-class Android(object):
 
-	# Initialise the connection with the Android tablet
+class Android(object):
 	def __init__(self):
+        # Initialise the connection with the Android tablet
 		self.isConnected = False
 		self.client = None
 		self.server = None

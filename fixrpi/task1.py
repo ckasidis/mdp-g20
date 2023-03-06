@@ -88,6 +88,7 @@ def process_image(image):
 
 class TimeoutException(Exception):   # Custom exception class
     pass
+
 def break_after(seconds=2):
     def timeout_handler(signum, frame):   # Custom signal handler
         raise TimeoutException
@@ -105,7 +106,7 @@ def break_after(seconds=2):
         return wrapper
     return function
 
-@break_after(5)
+@break_after(3)
 def readSTM(command):
 	data = ""
 	while True:

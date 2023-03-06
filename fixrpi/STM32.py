@@ -34,7 +34,7 @@ class STM32(object):
 
 	def disconnect(self):
 		try:
-			if (self.ser): #Check there is a serial instance created
+			if (self.ser): # Check there is a serial instance created
 				print("STM32: Disconnecting from STM32 Board ...")
 				self.ser.close()
 				self.isConnected = False
