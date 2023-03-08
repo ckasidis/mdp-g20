@@ -212,7 +212,7 @@ if __name__ == '__main__':
 				interfaces[STM].write(content)
 
 				# need to adjust 
-				time.sleep(5) 
+				time.sleep(3) 
 
 				readSTM(content)
 			
