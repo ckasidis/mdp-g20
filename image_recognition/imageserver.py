@@ -1,10 +1,13 @@
-from imutils import build_montages
 from datetime import datetime
-import numpy as np
-import imagezmq, imutils, cv2, torch
 
+import cv2
+import imagezmq
+import imutils
+import numpy as np
 import stitchImages
-from env import model_path, wts_path, ACTIVE_CHECK_SECONDS
+import torch
+from env import ACTIVE_CHECK_SECONDS, model_path, wts_path
+from imutils import build_montages
 
 model = torch.hub.load(model_path, 'custom', path=wts_path, source='local')  # local repo
 print("Model loaded")

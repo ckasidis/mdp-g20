@@ -3,22 +3,21 @@
 # Managing the communication between RPi and STM, RPi and Android
 # ===============================================================
 
-from multiprocessing import Process, Queue   # Manage multi-thread programming
-import time, signal
+import base64
+import glob
+import os
+import signal
+import socket
+import time
+from multiprocessing import Process, Queue  # Manage multi-thread programming
 
-from STM32 import STM32
-from Android import Android
-from AlgoPC import AlgoPC
-
-import imagezmq
 import cv2
+import imagezmq
+from AlgoPC import AlgoPC
+from Android import Android
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-
-import base64
-import os
-import glob
-import socket
+from STM32 import STM32
 
 img_directory = "/home/pi/mdp-g20/fixrpi/picamera_images/"
 image_processing_server_url = "tcp://192.168.20.25:5555"

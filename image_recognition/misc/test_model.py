@@ -1,10 +1,11 @@
 # import the necessary packages
-from imutils import build_montages
 from datetime import datetime
-import numpy as np
-import imutils
+
 import cv2
+import imutils
+import numpy as np
 import torch
+from imutils import build_montages
 
 model_path = 'C:/Users/siddh/Desktop/mdp-g20/image_recognition/yolov5/content/yolov5' # local
 wts_path = 'C:/Users/siddh/Desktop/mdp-g20/image_recognition/best-model.pt'
