@@ -1,5 +1,6 @@
 {
     "docwriter.style": "Google",
     "docwriter.progress.trackClasses": false,
-    "docwriter.progress.trackTypes": true
+    "docwriter.progress.trackTypes": true,
+    "python.formatting.provider": "black"
 }
